@@ -5,19 +5,30 @@
 
 ## 集成插件
 
-*   1、拷贝 `flutter_plugin_ad` 插件到 `lib/plugins` 目录下(其他位置也都可以)
-
-*   2、配置 `pubspec.yaml` 集成插件
-
+*   配置 `pubspec.yaml` 集成插件
 
 ```
 dependencies:
-    flutter:
-        sdk: flutter
-
-    flutter_plugin_ad:
-        path: lib/plugins/flutter_plugin_ad
+  flutter_openset_ads: ^1.0.0
 ```
+
+*   或通过下载 `flutter_plugin_ad` 拷贝插件到 `lib/plugins` 目录下(其他位置也都可以)
+
+```
+flutter_plugin_ad:
+  path: lib/plugins/flutter_plugin_ad # 本地引入
+```
+
+
+* 导入
+```
+在您的 Dart 代码中，您可以使用：
+import 'package:flutter_openset_ads/entity/ad_event.dart';
+import 'package:flutter_openset_ads/flutter_plugin_ad.dart';
+import 'package:flutter_openset_ads/view/banner_ad_widget.dart';
+import 'package:flutter_openset_ads/view/native_ad_widget.dart';
+```
+
 
 ## Android配置
 ## 接入前注意事项（请先阅读注意事项再进行sdk对接）
@@ -201,10 +212,10 @@ android项目模块目录下`android/app/build.gradle`中修改`minSdkVersion 21
 
 
 ```html
-<key>NSAppTransportSecurity</key> 
-<dict> 
-    <key>NSAllowsArbitraryLoads</key> 
-    <true/> 
+<key>NSAppTransportSecurity</key>
+<dict>
+    <key>NSAllowsArbitraryLoads</key>
+    <true/>
 </dict>
 
 ```
@@ -213,39 +224,39 @@ android项目模块目录下`android/app/build.gradle`中修改`minSdkVersion 21
 
 ```html
  <key>SKAdNetworkItems</key>
-    <array>
-        <dict>
-            <key>SKAdNetworkIdentifier</key>
-            <string>58922NB4GD.skadnetwork</string>
-	</dict>
-	<dict>
-	    <key>SKAdNetworkIdentifier</key>
-	    <string>238da6jt44.skadnetwork</string>
-	</dict>
-	<dict>
-		<key>SKAdNetworkIdentifier</key>
-		<string>r3y5dwb26t.skadnetwork</string>
-	</dict>
-	<dict>
-		<key>SKAdNetworkIdentifier</key>
-		<string>f7s53z58qe.skadnetwork</string>
-	</dict>
-	<dict>
-		<key>SKAdNetworkIdentifier</key>
-		<string>x2jnk7ly8j.skadnetwork</string>
-	</dict>
-	<dict>
-		<key>SKAdNetworkIdentifier</key>
-		<string>cstr6suwn9.skadnetwork</string>
-	</dict>
-	<dict>
-            <key>SKAdNetworkIdentifier</key>
-            <string>22mmun2rn5.skadnetwork</string>
-	</dict>
-	<dict>
-	        <key>SKAdNetworkIdentifier</key>
-	        <string>27a282f54n.skadnetwork</string>
-	</dict>
+<array>
+    <dict>
+        <key>SKAdNetworkIdentifier</key>
+        <string>58922NB4GD.skadnetwork</string>
+    </dict>
+    <dict>
+        <key>SKAdNetworkIdentifier</key>
+        <string>238da6jt44.skadnetwork</string>
+    </dict>
+    <dict>
+        <key>SKAdNetworkIdentifier</key>
+        <string>r3y5dwb26t.skadnetwork</string>
+    </dict>
+    <dict>
+        <key>SKAdNetworkIdentifier</key>
+        <string>f7s53z58qe.skadnetwork</string>
+    </dict>
+    <dict>
+        <key>SKAdNetworkIdentifier</key>
+        <string>x2jnk7ly8j.skadnetwork</string>
+    </dict>
+    <dict>
+        <key>SKAdNetworkIdentifier</key>
+        <string>cstr6suwn9.skadnetwork</string>
+    </dict>
+    <dict>
+        <key>SKAdNetworkIdentifier</key>
+        <string>22mmun2rn5.skadnetwork</string>
+    </dict>
+    <dict>
+        <key>SKAdNetworkIdentifier</key>
+        <string>27a282f54n.skadnetwork</string>
+    </dict>
 </array> 
 ```
 （可选配置，添加可增加收益）在您的应用的Info.plist文件中，添加一个数组LSApplicationQueriesSchemes键，如
@@ -253,8 +264,8 @@ android项目模块目录下`android/app/build.gradle`中修改`minSdkVersion 21
 
 ```html
  <key>LSApplicationQueriesSchemes</key> <array>
-<string>tbopen</string> <string>openapp.jdmobile</string> <string>alipays</string> <string>imeituan</string> <string>pddopen</string> <string>sinaweibo</string> <string>snssdk1128</string> <string>kwai</string> <string>ksnebula</string> <string>ctrip</string> <string>vipshop</string> <string>OneTravel</string> <string>taobaoliveshare</string> <string>taobaolite</string> <string>iqiyi</string> <string>eleme</string> <string>openjdlite</string> <string>xhsdiscover</string> <string>tmall</string> <string>dianping</string> <string>youku</string> <string>fleamarket</string> <string>bilibili</string> <string>freereader</string> <string>tantanapp</string> <string>suning</string> <string>qunariphone</string> <string>lianjia</string> <string>zhihu</string> <string>weixin</string> <string>travelguide</string> <string>wbmain</string> <string>taobaotravel</string> <string>cainiao</string> <string>kaola</string> <string>bitauto.yicheapp</string> <string>lianjiabeike</string> <string>taoumaimai</string> <string>amapuri</string> <string>openanjuke</string>
-<string>bosszp</string> <string>txvideo</string> <string>mttbrowser</string> <string>momochat</string> <string>baiduboxlite</string> <string>com.360buy.jdpingou</string> <string>vmall</string> <string>tuhu</string> <string>comjia</string> <string>yymobile</string> <string>shuqireader</string>
+    <string>tbopen</string> <string>openapp.jdmobile</string> <string>alipays</string> <string>imeituan</string> <string>pddopen</string> <string>sinaweibo</string> <string>snssdk1128</string> <string>kwai</string> <string>ksnebula</string> <string>ctrip</string> <string>vipshop</string> <string>OneTravel</string> <string>taobaoliveshare</string> <string>taobaolite</string> <string>iqiyi</string> <string>eleme</string> <string>openjdlite</string> <string>xhsdiscover</string> <string>tmall</string> <string>dianping</string> <string>youku</string> <string>fleamarket</string> <string>bilibili</string> <string>freereader</string> <string>tantanapp</string> <string>suning</string> <string>qunariphone</string> <string>lianjia</string> <string>zhihu</string> <string>weixin</string> <string>travelguide</string> <string>wbmain</string> <string>taobaotravel</string> <string>cainiao</string> <string>kaola</string> <string>bitauto.yicheapp</string> <string>lianjiabeike</string> <string>taoumaimai</string> <string>amapuri</string> <string>openanjuke</string>
+    <string>bosszp</string> <string>txvideo</string> <string>mttbrowser</string> <string>momochat</string> <string>baiduboxlite</string> <string>com.360buy.jdpingou</string> <string>vmall</string> <string>tuhu</string> <string>comjia</string> <string>yymobile</string> <string>shuqireader</string>
 </array>
 ```
 添加 NSUserTrackingUsageDescription 字段和自定义文案描述。
