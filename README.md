@@ -84,14 +84,14 @@ android {
 dependencies {
     
     //基础包 start
-    implementation("com.shenshi:ad-openset-sdk:6.5.2.2")
+    implementation("com.shenshi:ad-openset-sdk:6.5.2.6")
     //基础包 end
-
+    
     //    百度 start
     // 注意百度9.373版本开始，强制使用Androidx，如果使用这个版本以上的百度sdk，请将项目改为Androidx
     implementation 'com.shenshi:ad-baidu-adapter:9.391.1'
     //    百度 end
-
+    
 //    穿山甲&GroMore start
     implementation("com.shenshi:ad-gromore-ad-adapter:6.8.4.0.1")// 纯广告SDK
 
@@ -102,7 +102,7 @@ dependencies {
 //    implementation("com.shenshi:ad-gromore-ct-adapter:6.8.4.0.1") {
 //        exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk7'
 //    }// 包括广告和短剧内容SDK
-
+    
     //注意！！! 穿山甲短剧依赖okhttp，如果没有会闪退，如果已经添加请忽略，没有添加请添加okhttp，
     //另外，tanx默认依赖okhttp，如果 已经依赖了tanx，也不需要再添加okhttp
 //    implementation 'com.squareup.okhttp3:okhttp:4.12.0'
@@ -113,8 +113,8 @@ dependencies {
     //sigmob end
 
     //快手 start
-//    implementation 'com.shenshi:ad-kuaishou-ad-adapter:4.4.20.1.1'// 快手-纯广告SDK
-    implementation("com.shenshi:ad-kuaishou-ct-adapter:3.3.76.5.1")// 快手-包括广告和内容SDK
+    implementation 'com.shenshi:ad-kuaishou-ad-adapter:4.4.20.1.2'// 快手-纯广告SDK
+//    implementation 'com.shenshi:ad-kuaishou-ct-adapter:3.3.76.5.2'// 快手-包括广告和内容SDK
     //快手 end
 
     //广点通 start
@@ -147,7 +147,7 @@ dependencies {
 
     //multidex 64K问题，如果已添加请忽略
     implementation 'com.android.support:multidex:1.0.3'
-
+    
     //微信小程序广告预算相关，引入可提升ecpm。强烈建议引入
     /**
      * 1，进入微信开放平台创建移动应用;
