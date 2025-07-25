@@ -1,14 +1,15 @@
-name: flutter_plugin_ad
+name: flutter_openset_ads
 description: A openset sdk Flutter plugin.
-version: 1.0.1
+version: 1.0.0
 publish_to: https://pub.dev
 
-homepage: https://example.com
-repository: https://example.com
-issue_tracker: https://example.com
+homepage: https://github.com/OSETSDK/flutter_plugin_ad.git
+repository: https://github.com/OSETSDK/flutter_plugin_ad.git
+issue_tracker: https://github.com/OSETSDK/flutter_plugin_ad.git
 
 environment:
   sdk: ">=2.18.0 <4.0.0"
+  flutter: ">=1.10.0"
 
 dependencies:
   flutter:

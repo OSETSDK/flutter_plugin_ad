@@ -1,5 +1,5 @@
-name: flutter_plugin_ad_example
-description: Demonstrates how to use the flutter_plugin_ad plugin.
+name: flutter_openset_ads_example
+description: Demonstrates how to use the flutter_openset_ads plugin.
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `pub publish`. This is preferred for private packages.
@@ -12,7 +12,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  flutter_plugin_ad:
+  flutter_openset_ads:
     # When depending on this package from a real application you should use:
     #   flutter_plugin_ad: ^x.y.z
     # See https://dart.dev/tools/pub/dependencies#version-constraints
