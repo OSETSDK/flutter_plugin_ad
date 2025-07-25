@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_plugin_ad/flutter_plugin_ad.dart';
+import 'package:flutter_openset_ads/view/native_ad_widget.dart';
 
 /// 原生信息流广告页面
 class NativePage extends StatefulWidget {
