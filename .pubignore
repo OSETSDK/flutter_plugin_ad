@@ -1,0 +1,17 @@
+# 忽略构建输出
+build/
+.dart_tool/
+.packages
+pubspec.lock
+
+# 示例项目文件不需要上传
+example/
+test/
+
+# IDE 和系统文件
+*.iml
+.idea/
+*.log
+*.tmp
+*.swp
+.DS_Store

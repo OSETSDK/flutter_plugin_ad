@@ -1,0 +1,150 @@
+
+plugins {
+    id "com.android.library"
+}
+group 'com.sskj.flutter_plugin_ad'
+version '1.0'
+
+// 定义一个方法, 用于获取当前moudle的dir, flutter_plugin_ad是不插件的名字
+def getCurrentProjectDir() {
+    String result = ""
+    rootProject.allprojects { project ->
+        if (project.properties.get("identityPath").toString() == ":flutter_plugin_ad") {
+            // 这里是flutter的约定, 插件的module名是插件名, :是gradle的约定. project前加:
+            result = project.properties.get("projectDir").toString()
+        }
+    }
+    return result
+}
+
+rootProject.allprojects {
+
+    def dir = getCurrentProjectDir() // 获取当前Moudle目录
+
+    repositories {
+        google()
+        jcenter()
+        mavenCentral()
+        maven { url 'https://mirrors.tuna.tsinghua.edu.cn/flutter/download.flutter.io' }
+        // GroMore
+        maven { url "https://artifact.bytedance.com/repository/Volcengine/" }
+        maven { url "https://artifact.bytedance.com/repository/pangle" }
+//        荣耀
+        maven { url 'https://developer.hihonor.com/repo' }
+//        adset
+        maven {
+            allowInsecureProtocol = true
+            url "http://maven.shenshiads.com/nexus/repository/adset/"
+        }
+
+//        maven { // 添加这个指向本地的仓库目录
+//            url "$dir/aar"
+//        }
+    }
+}
+
+//apply plugin: 'com.android.library'
+
+android {
+    namespace "com.sskj.flutter_plugin_ad"
+    compileSdk 34
+    buildToolsVersion '34.0.0'
+//    ndkVersion '25.1.8937393'
+
+    defaultConfig {
+        minSdkVersion 21
+        targetSdkVersion 34
+    }
+
+    //app目录下加入这个代码
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+
+    //android基础包
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'com.google.android.material:material:1.0.0'
+    implementation 'com.google.code.gson:gson:2.8.6'
+    implementation 'com.android.support.constraint:constraint-layout:2.0.4'
+
+
+
+    //基础包 start
+    implementation("com.shenshi:ad-openset-sdk:6.5.2.2")
+    //基础包 end
+
+    //    百度 start
+    // 注意百度9.373版本开始，强制使用Androidx，如果使用这个版本以上的百度sdk，请将项目改为Androidx
+    implementation 'com.shenshi:ad-baidu-adapter:9.391.1'
+    //    百度 end
+
+//    穿山甲&GroMore start
+    implementation("com.shenshi:ad-gromore-ad-adapter:6.8.4.0.1")// 纯广告SDK
+
+    //因为tanx会依赖第三方库 implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.8.0' 会和 gromore短剧的依赖库冲突，如果不使用tanx，请按照这个对接
+//    implementation("com.shenshi:ad-gromore-ct-adapter:6.8.4.0.1") // 包括广告和短剧内容SDK
+
+    //因为tanx会依赖第三方库 implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.8.0' 会和 gromore短剧的依赖库冲突，如果使用tanx，请按照这个对接
+//    implementation("com.shenshi:ad-gromore-ct-adapter:6.8.4.0.1") {
+//        exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk7'
+//    }// 包括广告和短剧内容SDK
+
+    //注意！！! 穿山甲短剧依赖okhttp，如果没有会闪退，如果已经添加请忽略，没有添加请添加okhttp，
+    //另外，tanx默认依赖okhttp，如果 已经依赖了tanx，也不需要再添加okhttp
+//    implementation 'com.squareup.okhttp3:okhttp:4.12.0'
+//    穿山甲&GroMore end
+
+    //sigmob start
+    implementation("com.shenshi:ad-sigmob-adapter:4.23.0.1")
+    //sigmob end
+
+    //快手 start
+//    implementation 'com.shenshi:ad-kuaishou-ad-adapter:4.4.20.1.1'// 快手-纯广告SDK
+    implementation("com.shenshi:ad-kuaishou-ct-adapter:3.3.76.5.1")// 快手-包括广告和内容SDK
+    //快手 end
+
+    //广点通 start
+    implementation 'com.shenshi:ad-guangdiantong-adapter:4.640.1510.1'
+    //广点通 end
+
+    //倍孜 start
+    implementation 'com.shenshi:ad-beizi-adapter:5.2.1.6.1'
+    //倍孜 end
+
+    //tanx start
+    implementation 'com.shenshi:ad-tanx-adapter:3.7.13.1'
+    //tanx end
+
+    //海量 start
+    implementation 'com.shenshi:ad-hailiang-adapter:3.470.13.436.1'
+    //海量 end
+
+    //章鱼 start
+    implementation 'com.shenshi:ad-zhangyu-adapter:1.6.3.6.1'
+    //章鱼 end
+
+    // 京东 start
+    //京东 androidx环境请使用
+    implementation 'com.shenshi:ad-jingdong-androidx-adapter:2.6.32.1'
+
+    //京东 support环境请使用
+//    implementation 'com.shenshi:ad-jingdong-support-adapter:2.6.32.1'
+    // 京东 end
+
+    //multidex 64K问题，如果已添加请忽略
+    implementation 'com.android.support:multidex:1.0.3'
+
+    //微信小程序广告预算相关，引入可提升ecpm。强烈建议引入
+    /**
+     * 1，进入微信开放平台创建移动应用;
+     * 2，应用创建完成后，获取到相应的微信ApplD;
+     * 3.在移动端嵌入最新版OpenSDK，并确认版本为5.3.1及以上;
+     * 4.在优量汇开发者平台，将微信开放平台填写的AppID与当前应用进行关联;
+     * 第四步联系我们运营帮你们配置
+     */
+    implementation 'com.tencent.mm.opensdk:wechat-sdk-android:6.8.28'
+}
