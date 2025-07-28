@@ -15,7 +15,7 @@
         self = [super init];
         self.bannerFrame = frame;
         if (adId && ![adId isKindOfClass:[NSNull class]] && adId.length>0) {
-            self.bannerAd = [[OSETBannerAd alloc] initWithSlotId:@"7B2BD37383E008B422C93486EACEA11D" rootViewController:[UIApplication sharedApplication].delegate.window.rootViewController rect:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, frame.size.height)];
+            self.bannerAd = [[OSETBannerAd alloc] initWithSlotId:adId rootViewController:[UIApplication sharedApplication].delegate.window.rootViewController rect:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, frame.size.height)];
             self.bannerAd.delegate = self;
             [self.bannerAd loadAdData];
         }

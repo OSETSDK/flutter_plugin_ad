@@ -15,7 +15,7 @@
         self = [super init];
         self.nativeFrame = frame;
         if (adId && ![adId isKindOfClass:[NSNull class]] && adId.length>0) {
-            self.nativeAd  = [[OSETNativeAd alloc]initWithSlotId:@"921DE1BF1B3F06838AE04233A42B01F1" size:CGSizeMake([UIScreen mainScreen].bounds.size.width, frame.size.height) rootViewController:[FlutterPluginAdPlugin shareInstance].rootVC];
+            self.nativeAd  = [[OSETNativeAd alloc]initWithSlotId:adId size:CGSizeMake([UIScreen mainScreen].bounds.size.width, frame.size.height) rootViewController:[FlutterPluginAdPlugin shareInstance].rootVC];
             self.nativeAd.delegate = self;
             [self.nativeAd loadAdData];
         }
