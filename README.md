@@ -200,13 +200,19 @@ android项目模块目录下`android/app/build.gradle`中修改`minSdkVersion 21
 | 信息流内容模块2id | EBE266AAE65F52C37A28BF2D586132EB |
 | 悬浮窗模块id | C20D0FDCA88E06E6718A33279AAD2B4D |
 
-## iOS配置
 
 ## iOS配置
 
-*   1、拷贝framework 拷⻉ `flutter_plugin_ad/ios/Runner/AdSDK` ⽬录下的所有依赖包到您的项⽬的 `ios/Runner/` ⽬录下（或者参考ios原生对接文档 全部手动导入则无需pod）
-*   ![](https://fpvideo.shenshiads.com/ios_zip/flutteriOS1.png)
-*   ![](https://fpvideo.shenshiads.com/ios_zip/flutteriOS2.png)
+*   1、添加 NSUserTrackingUsageDescription （IDFA描述）字段和自定义文案描述。
+
+代码示例：
+
+```html
+ <key>NSUserTrackingUsageDescription</key>
+<string>该标识符将用于向您投放个性化广告</string>
+
+} 
+```
 *   2、 设置允许Http连接,在工程的 Info.plist 文件中，设置 App Transport Security Settings
     选项下 Allow Arbitrary Loads 值为 YES，对应 plist 内容为:
 
@@ -268,19 +274,9 @@ android项目模块目录下`android/app/build.gradle`中修改`minSdkVersion 21
     <string>bosszp</string> <string>txvideo</string> <string>mttbrowser</string> <string>momochat</string> <string>baiduboxlite</string> <string>com.360buy.jdpingou</string> <string>vmall</string> <string>tuhu</string> <string>comjia</string> <string>yymobile</string> <string>shuqireader</string>
 </array>
 ```
-添加 NSUserTrackingUsageDescription 字段和自定义文案描述。
 
-代码示例：
-
-```html
- <key>NSUserTrackingUsageDescription</key>
-<string>该标识符将用于向您投放个性化广告</string>
-
-} 
-```
-*   3、podfile里添加依赖库（参考demo） 执行pod install
-*   4、在APPdelegate里注册（swift项目需在Runner-Bridging-Header里引入头文件）
-*   5、广告调用于安卓完全一致 但 广告位id和初始化appkey都是分开的
+*   3、 执行pod install
+*   4、广告调用于安卓完全一致 但 广告位id和初始化appkey都是分开的
 
 | ios测试_appkey                |  31DC084BB6B04838 |
 |-----------------------|------------------------|
@@ -296,18 +292,6 @@ android项目模块目录下`android/app/build.gradle`中修改`minSdkVersion 21
 | ios测试_插屏           | 351C1A89F8AE79DF62C1B1165A5EAFCC |
 | ios测试_banner       | 7B2BD37383E008B422C93486EACEA11D |
 | ios测试_开屏           | 18666EAA65EC1969E90E982DCA2CB2DD |
-
-	```
-     //Swift 注册广告 swift需要在桥接文件里引入头文件
-    IOSFlutterPlatformViewFactory.register(with: self.registrar(forPlugin: "flutter_plugin_ad_banner")!)
-	OSETSDKPlugin.shareInstance().initSDK(self, with: self.window); 	
-	//OC 注册广告 需要引入头文件IOSFlutterPlatformViewFactory和OSETSDKPlugin
-	//[IOSFlutterPlatformViewFactory registerWithRegistrar:[self registrarForPlugin:@"flutter_plugin_ad_banner"]];
-	//[[OSETSDKPlugin alloc]initSDK:self withWindow:self.window];
-	```
-
-
-
 
 
 ## 广告接口
