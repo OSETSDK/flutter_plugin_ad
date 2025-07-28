@@ -9,7 +9,7 @@
 
 ```
 dependencies:
-  flutter_openset_ads: ^1.0.0
+  flutter_openset_ads: ^1.0.1
 ```
 
 *   或通过下载 `flutter_plugin_ad` 拷贝插件到 `lib/plugins` 目录下(其他位置也都可以)
@@ -84,7 +84,7 @@ android {
 dependencies {
     
     //基础包 start
-    implementation("com.shenshi:ad-openset-sdk:6.5.2.6")
+    implementation("com.shenshi:ad-openset-sdk:6.5.2.5")
     //基础包 end
     
     //    百度 start
