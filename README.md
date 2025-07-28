@@ -9,7 +9,7 @@
 
 ```
 dependencies:
-  flutter_openset_ads: ^1.0.2
+  flutter_openset_ads: ^1.0.0
 ```
 
 *   或通过下载 `flutter_plugin_ad` 拷贝插件到 `lib/plugins` 目录下(其他位置也都可以)
@@ -84,7 +84,7 @@ android {
 dependencies {
     
     //基础包 start
-    implementation("com.shenshi:ad-openset-sdk:6.5.2.5")
+    implementation("com.shenshi:ad-openset-sdk:6.5.2.6")
     //基础包 end
     
     //    百度 start
@@ -211,7 +211,6 @@ android项目模块目录下`android/app/build.gradle`中修改`minSdkVersion 21
  <key>NSUserTrackingUsageDescription</key>
 <string>该标识符将用于向您投放个性化广告</string>
 
-} 
 ```
 *   2、 设置允许Http连接,在工程的 Info.plist 文件中，设置 App Transport Security Settings
     选项下 Allow Arbitrary Loads 值为 YES，对应 plist 内容为:
@@ -281,10 +280,6 @@ android项目模块目录下`android/app/build.gradle`中修改`minSdkVersion 21
 | ios测试_appkey                |  31DC084BB6B04838 |
 |-----------------------|------------------------|
 | ios测试_广告类型         | ios测试_广告位ID          |
-| ios测试_短剧内容         | A0736045CDDF718C13DFF187254EA1D0 |
-| ios测试_视频内容         | E06C7BB2C34605B4CD777EFD590DD4BE |
-| ios测试_互动悬浮         | 4224443B309508BE30C3B8AC7CDE87C1 |
-| ios测试_draw          | C773D52F59FF5AA418CD9E2181327197 |
 | ios测试_信息流          | 3DC16BFC019545395507ED826899B16E |
 | ios测试_原生           | 921DE1BF1B3F06838AE04233A42B01F1 |
 | ios测试_全屏           | 8FCB39267CE40245B87EF8835A853708 |
@@ -310,11 +305,12 @@ android项目模块目录下`android/app/build.gradle`中修改`minSdkVersion 21
 
 ###   检查并请求权限（仅 Android）
 ``` 
-    *   检查并请求权限（仅 Android）
+    *   检查并请求权限（仅 Android，iOS调用则会检查广告追踪权限（IDFA））
     *   **建议app中必须调用权限，有助于提升广告收入**
     ```
     /// 检查并请求权限（仅 Android）
     FlutterPluginAd.checkAndReqPermission();
+
 ```
 
 ###   添加⼴告监听
@@ -379,8 +375,8 @@ android项目模块目录下`android/app/build.gradle`中修改`minSdkVersion 21
         
         /// 这⾥ BannerAd 是⼀个 Widget ，你可以放到任何 Flutter 组件上
         /// [adId] ⼴告配置 adIdBanner
-        // 注意，如果不设置高度，那么会默认填充整个父Widget
-        SizedBox(height: 50, child: BannerAdWidget(adId: adIdBanner)));
+        // 注意，(安卓如果不设置高度，那么会默认填充整个父Widget)(iOS需传后面的height参数作为高度，如果不传则使用默认高度)
+        SizedBox(height: 50, child: BannerAdWidget(adId: adIdBanner, height: '50')));
 ```
 
 ###   原生信息流⼴告
@@ -389,8 +385,8 @@ android项目模块目录下`android/app/build.gradle`中修改`minSdkVersion 21
         
         /// 这⾥ NativeAd 是⼀个 Widget ，你可以放到任何 Flutter 组件上
         /// [adId] ⼴告配置 adIdNative
-        // 注意，如果不设置高度，那么会默认填充整个父Widget
-        SizedBox(height: 310, child: NativeAdWidget(adId: adIdNative)));
+        // 注意，(安卓如果不设置高度，那么会默认填充整个父Widget)(iOS需传后面的height参数作为高度，如果不传则使用默认高度)
+        SizedBox(height: 310, child: NativeAdWidget(adId: adIdNative, height: '310')));
 ```
 
 ###  学习天地

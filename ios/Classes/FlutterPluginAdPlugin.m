@@ -2,6 +2,7 @@
 #import <AppTrackingTransparency/AppTrackingTransparency.h>
 #import <AdSupport/AdSupport.h>
 #import "IOSFlutterPlatformViewFactory.h"
+#import "IOSFlutterNativeViewFactory.h"
 // 未知
 #define  unknown  @"unknown"
 // 广告加载完毕
@@ -32,7 +33,10 @@ static FlutterPluginAdPlugin *manager = nil;
             binaryMessenger:[registrar messenger]];
   FlutterPluginAdPlugin * instance = [FlutterPluginAdPlugin shareInstance];
   [registrar addMethodCallDelegate:instance channel:channel];
+    
     [registrar registerViewFactory:[[IOSFlutterPlatformViewFactory alloc] init] withId:@"flutter_plugin_ad_banner"];
+    
+    [registrar registerViewFactory:[[IOSFlutterNativeViewFactory alloc] init] withId:@"flutter_plugin_ad_native"];
 }
 + (instancetype)shareInstance{
     static dispatch_once_t onceToken;

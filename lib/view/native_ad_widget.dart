@@ -5,9 +5,10 @@ import 'package:flutter/services.dart';
 
 /// 原生信息流广告组件
 class NativeAdWidget extends StatefulWidget {
-  NativeAdWidget({Key? key, this.adId}) : super(key: key);
+  NativeAdWidget({Key? key, this.adId, this.height}) : super(key: key);
   // 广告 id
   final String? adId;
+  final String? height;
 
   @override
   _NativeAdWidgetState createState() => _NativeAdWidgetState();
@@ -24,7 +25,8 @@ class _NativeAdWidgetState extends State<NativeAdWidget> {
   @override
   Widget build(BuildContext context) {
     Map<String, dynamic> creationParams = <String, dynamic>{
-      "adId": widget.adId
+      "adId": widget.adId,
+      "height": widget.height
     };
     if (Platform.isIOS) {
       return UiKitView(

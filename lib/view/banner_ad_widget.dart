@@ -5,9 +5,10 @@ import 'package:flutter/services.dart';
 
 /// Banner 广告组件
 class BannerAdWidget extends StatefulWidget {
-  BannerAdWidget({Key? key, this.adId}) : super(key: key);
+  BannerAdWidget({Key? key, this.adId, this.height}) : super(key: key);
   // 广告 id
   final String? adId;
+  final String? height;
 
   @override
   _BannerAdWidgetState createState() => _BannerAdWidgetState();
@@ -24,7 +25,8 @@ class _BannerAdWidgetState extends State<BannerAdWidget> {
   @override
   Widget build(BuildContext context) {
     Map<String, dynamic> creationParams = <String, dynamic>{
-      "adId": widget.adId
+      "adId": widget.adId,
+      "height": widget.height
     };
     if (Platform.isIOS) {
       return UiKitView(

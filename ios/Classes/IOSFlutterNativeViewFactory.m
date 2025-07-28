@@ -1,13 +1,13 @@
 //
-//  IOSFlutterPlatformViewFactory.m
-//  Runner
+//  IOSFlutterNativeViewFactory.m
+//  flutter_openset_ads
 //
-//  Created by YaoHaoFei on 2022/4/21.
+//  Created by Shens on 28/7/2025.
 //
 
-#import "IOSFlutterPlatformViewFactory.h"
-#import "IOSPlatformView.h"
-@implementation IOSFlutterPlatformViewFactory
+#import "IOSFlutterNativeViewFactory.h"
+#import "IOSFlutterNativeView.h"
+@implementation IOSFlutterNativeViewFactory
 
 /**
  * 返回platformview实现类
@@ -20,13 +20,13 @@
     //这里可以解析args参数，根据参数进行响应的操作
     if (args) {
         NSDictionary * dict = [NSDictionary dictionaryWithDictionary:args];
-        CGFloat height = 100;
+        CGFloat height = 300;
         if(dict[@"height"]){
             height = [dict[@"height"] floatValue];
         }
-        return [[IOSPlatformView alloc]initWithAdId:dict[@"adId"] withFrame:CGRectMake(0, 0, 0,height)];
+        return [[IOSFlutterNativeView alloc] initWithAdId:dict[@"adId"] withFrame:CGRectMake(0, 0, 0,height)];
     }
-    return [[IOSPlatformView alloc]initWithAdId:@"" withFrame:frame];
+    return [[IOSFlutterNativeView alloc]initWithAdId:@"" withFrame:CGRectMake(0, 0, 0,0)];
 }
 
 //如果需要使用args传参到ios，需要实现这个方法，返回协议。否则会失败。
@@ -34,6 +34,6 @@
     return [FlutterStandardMessageCodec sharedInstance];
 }
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar> *)registrar{
-    [registrar registerViewFactory:[[IOSFlutterPlatformViewFactory alloc] init] withId:@"flutter_plugin_ad_banner"];
+    [registrar registerViewFactory:[[IOSFlutterNativeViewFactory alloc] init] withId:@"flutter_plugin_ad_native"];
 }
 @end
