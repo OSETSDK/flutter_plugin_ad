@@ -4,7 +4,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'flutter_openset_ads'
-  s.version          = '0.0.1'
+  s.version          = '1.0.5'
   s.summary          = 'A new Flutter plugin.'
   s.description      = <<-DESC
 A new Flutter plugin.
@@ -18,7 +18,7 @@ A new Flutter plugin.
   s.dependency 'Flutter'
   s.platform = :ios, '12.0'
   s.static_framework = true
-  s.dependency 'OSETSDK', '6.3.7.7'
+  s.dependency 'OSETSDK', '6.3.7.8'
 
   # Flutter.framework does not contain a i386 slice.
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386' }
