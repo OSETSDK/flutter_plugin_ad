@@ -207,7 +207,7 @@ android项目模块目录下`android/app/build.gradle`中修改`minSdkVersion 21
 
 代码示例：
 
-```html
+```xml
  <key>NSUserTrackingUsageDescription</key>
 <string>该标识符将用于向您投放个性化广告</string>
 
@@ -216,7 +216,7 @@ android项目模块目录下`android/app/build.gradle`中修改`minSdkVersion 21
     选项下 Allow Arbitrary Loads 值为 YES，对应 plist 内容为:
 
 
-```html
+```xml
 <key>NSAppTransportSecurity</key>
 <dict>
     <key>NSAllowsArbitraryLoads</key>
@@ -227,7 +227,7 @@ android项目模块目录下`android/app/build.gradle`中修改`minSdkVersion 21
 在您的应用的Info.plist文件中，添加一个字符串SKAdNetworkItems键，如
 
 
-```html
+```xml
  <key>SKAdNetworkItems</key>
 <array>
     <dict>
@@ -267,7 +267,7 @@ android项目模块目录下`android/app/build.gradle`中修改`minSdkVersion 21
 （可选配置，添加可增加收益）在您的应用的Info.plist文件中，添加一个数组LSApplicationQueriesSchemes键，如
 
 
-```html
+```xml
  <key>LSApplicationQueriesSchemes</key> <array>
     <string>tbopen</string> <string>openapp.jdmobile</string> <string>alipays</string> <string>imeituan</string> <string>pddopen</string> <string>sinaweibo</string> <string>snssdk1128</string> <string>kwai</string> <string>ksnebula</string> <string>ctrip</string> <string>vipshop</string> <string>OneTravel</string> <string>taobaoliveshare</string> <string>taobaolite</string> <string>iqiyi</string> <string>eleme</string> <string>openjdlite</string> <string>xhsdiscover</string> <string>tmall</string> <string>dianping</string> <string>youku</string> <string>fleamarket</string> <string>bilibili</string> <string>freereader</string> <string>tantanapp</string> <string>suning</string> <string>qunariphone</string> <string>lianjia</string> <string>zhihu</string> <string>weixin</string> <string>travelguide</string> <string>wbmain</string> <string>taobaotravel</string> <string>cainiao</string> <string>kaola</string> <string>bitauto.yicheapp</string> <string>lianjiabeike</string> <string>taoumaimai</string> <string>amapuri</string> <string>openanjuke</string>
     <string>bosszp</string> <string>txvideo</string> <string>mttbrowser</string> <string>momochat</string> <string>baiduboxlite</string> <string>com.360buy.jdpingou</string> <string>vmall</string> <string>tuhu</string> <string>comjia</string> <string>yymobile</string> <string>shuqireader</string>
