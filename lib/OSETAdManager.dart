@@ -1,6 +1,8 @@
 import 'package:flutter_openset_ads/OSETAd.dart';
 import 'package:flutter_openset_ads/OSETAdSDK.dart';
 import 'package:flutter_openset_ads/loader/OSETAdLoader.dart';
+import 'package:flutter_openset_ads/loader/OSETNativeAdLoader.dart';
+import 'package:flutter_openset_ads/widget/native/OSETNativeAd.dart';
 
 class OSETAdManager {
   static const _eventOnAdLoaded = 'onAdLoaded';
@@ -10,6 +12,7 @@ class OSETAdManager {
   static const _eventOnAdClose = 'onAdClosed';
   static const _eventOnAdReward = 'onReward';
   static const _eventOnAdTimeOver = 'onAdTimeOver';
+  static const _eventOnAdMeasured = 'OnAdMeasured';
 
   static final List<OSETAdLoader> _adLoaderList = [];
 
@@ -50,39 +53,47 @@ class OSETAdManager {
     _adLoaderList.remove(osetAdLoader);
   }
 
-  /// 广告事件
+  /// 原生调用flutter广告事件
   static onAdEvent({required Map<dynamic, dynamic> arguments}) {
     var adId = arguments[OSETAdSDK.keyAdId];
-    var OSETAdLoader = _findOSETAdLoader(adId);
-    if (OSETAdLoader == null) return;
+    var osetAdLoader = _findOSETAdLoader(adId);
+    if (osetAdLoader == null) return;
 
     var adEvent = arguments[OSETAdSDK.keyAdEvent];
     if (adEvent == null) return;
 
-    var osetAd = OSETAdLoader.findOSETAd(adId: adId);
+    var osetAd = osetAdLoader.findOSETAd(adId: adId);
     if (osetAd == null) return;
 
     switch (adEvent) {
       case _eventOnAdLoaded:
-        OSETAdLoader.onAdLoadCallback(osetAd);
+        osetAdLoader.onAdLoadCallback(osetAd);
         break;
       case _eventOnAdLoadFail:
-        OSETAdLoader.onAdFailedCallback(arguments[OSETAdSDK.keyAdMsg]);
+        osetAdLoader.onAdFailedCallback(arguments[OSETAdSDK.keyAdMsg]);
         break;
       case _eventOnAdExpose:
-        OSETAdLoader.onAdExposeCallback(osetAd);
+        osetAdLoader.onAdExposeCallback(osetAd);
         break;
       case _eventOnAdClick:
-        OSETAdLoader.onAdClickCallback(osetAd);
+        osetAdLoader.onAdClickCallback(osetAd);
         break;
       case _eventOnAdClose:
-        OSETAdLoader.onAdCloseCallback(osetAd);
+        osetAdLoader.onAdCloseCallback(osetAd);
         break;
       case _eventOnAdReward:
-        OSETAdLoader.onAdRewardCallback(osetAd);
+        osetAdLoader.onAdRewardCallback(osetAd);
         break;
       case _eventOnAdTimeOver:
-        OSETAdLoader.onAdTimeOverCallback(osetAd);
+        osetAdLoader.onAdTimeOverCallback(osetAd);
+        break;
+      case _eventOnAdMeasured:
+        if (osetAdLoader is OSETNativeAdLoader &&
+            osetAd is OSETNativeAd) {
+          double adWidth = arguments[OSETAdSDK.keyAdWidth] ?? 0;
+          double adHeight = arguments[OSETAdSDK.keyAdHeight] ?? 0;
+          osetAdLoader.onAdMeasured(osetAd, adWidth, adHeight);
+        }
         break;
     }
   }

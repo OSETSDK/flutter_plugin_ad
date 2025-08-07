@@ -1,6 +1,8 @@
 import 'dart:io';
 
 import 'package:example/page/InterstitialAdPage.dart';
+import 'package:example/page/NativeAdPage.dart';
+import 'package:example/page/RewardVideoAdPage.dart';
 import 'package:example/page/SplashAdLauncherPage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -8,6 +10,7 @@ import 'package:flutter_openset_ads/OSETAdSDK.dart';
 import 'package:example/widget/common_button.dart';
 
 import '../common/Common.dart';
+import 'FullVideoAdPage.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -61,12 +64,15 @@ class _MainState extends State<MainPage> {
                     _push(context, const InterstitialAdPage());
                   }),
                   buildCommonButton('全屏视频广告', callback: () {
+                    _push(context, const FullVideoAdPage());
                   }),
                   buildCommonButton('激励视频广告', callback: () {
+                    _push(context, const RewardVideoAdPage());
                   }),
                   buildCommonButton('Banner广告', callback: () {
                   }),
                   buildCommonButton('原生信息流广告', callback: () {
+                    _push(context, const NativeAdPage());
                   }),
                   buildCommonButton('短视频内容', callback: () {
                   }),

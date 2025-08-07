@@ -26,7 +26,7 @@ class OSETAdSDK {
   static const methodInit = 'initAd';
   static const methodLoadSplashAd = 'showSplashAd';
   static const methodShowInterstitialAd = 'showInterstitialAd';
-  static const methodLoadFullVideoAd = 'showFullscreenVideoAd';
+  static const methodShowFullVideoAd = 'showFullscreenVideoAd';
   static const methodStartLoadRewardVideoAd = 'startLoadRewardVideoAd';
   static const methodLoadRewardVideoAd = 'showRewardVideoAd';
   static const methodLoadBannerAd = "loadBannerAd";

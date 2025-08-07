@@ -1,6 +1,8 @@
 import 'package:example/page/MainPage.dart';
 import 'package:flutter/material.dart';
 
+String TAG = 'adset';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 

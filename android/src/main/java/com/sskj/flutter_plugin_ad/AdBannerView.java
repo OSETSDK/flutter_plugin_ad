@@ -15,6 +15,7 @@ import com.kc.openset.ad.banner.OSETBanner;
 import com.kc.openset.ad.banner.OSETBannerAd;
 import com.kc.openset.ad.listener.OSETBannerAdLoadListener;
 import com.kc.openset.ad.listener.OSETBannerListener;
+import com.sskj.flutter_plugin_ad.config.OSETAdEvent;
 
 import java.util.Map;
 
@@ -41,7 +42,7 @@ class AdBannerView implements PlatformView {
         String posId = (String) creationParams.get(POS_ID);
         String adId = (String) creationParams.get(AD_ID);
         if (TextUtils.isEmpty(posId)) {
-            this.pluginDelegate.postEvent(adId, "参数错误，posId 不能为空", AdEventChannel.onAdError);
+            this.pluginDelegate.postEvent(adId, "参数错误，posId 不能为空", OSETAdEvent.onAdError);
             return;
         }
         frameLayout = new FrameLayout(context);
@@ -77,7 +78,7 @@ class AdBannerView implements PlatformView {
                         osetBannerAd.render(activity, new OSETBannerListener() {
                             @Override
                             public void onClick(View view) {
-                                pluginDelegate.postEvent(adId, AdEventChannel.onAdClicked);
+                                pluginDelegate.postEvent(adId, OSETAdEvent.onAdClicked);
                             }
 
                             @Override
@@ -85,7 +86,7 @@ class AdBannerView implements PlatformView {
                                 if (frameLayout != null) {
                                     frameLayout.removeAllViews();
                                 }
-                                pluginDelegate.postEvent(adId, AdEventChannel.onAdClosed);
+                                pluginDelegate.postEvent(adId, OSETAdEvent.onAdClosed);
                             }
 
                             @Override
@@ -97,19 +98,19 @@ class AdBannerView implements PlatformView {
 
                             @Override
                             public void onShow(View view) {
-                                pluginDelegate.postEvent(adId, AdEventChannel.onAdExposure);
+                                pluginDelegate.postEvent(adId, OSETAdEvent.onAdExposure);
                             }
 
                             @Override
                             public void onError(String s, String s1) {
-                                pluginDelegate.postEvent(adId, "渲染banner广告失败：" + s + ", " + s1, AdEventChannel.onAdError);
+                                pluginDelegate.postEvent(adId, "渲染banner广告失败：" + s + ", " + s1, OSETAdEvent.onAdError);
                             }
                         });
                     }
 
                     @Override
                     public void onLoadFail(String s, String s1) {
-                        pluginDelegate.postEvent(adId, "加载banner广告失败：" + s + ", " + s1, AdEventChannel.onAdError);
+                        pluginDelegate.postEvent(adId, "加载banner广告失败：" + s + ", " + s1, OSETAdEvent.onAdError);
                     }
                 });
     }

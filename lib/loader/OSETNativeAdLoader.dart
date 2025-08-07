@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_openset_ads/OSETAdSDK.dart';
 import 'package:flutter_openset_ads/loader/OSETAdLoader.dart';
 import 'package:flutter_openset_ads/widget/native/OSETNativeAd.dart';
@@ -8,29 +9,53 @@ class OSETNativeAdLoader extends OSETAdLoader<OSETNativeAd> {
   loadAd({
     required String posId,
     required double adWidth,
-    required double adHeight,
   }) {
-    load(posId: posId, methodName: OSETAdSDK.methodLoadNativeAd,
-        arguments: {
-          OSETAdSDK.keyAdWidth: adWidth,
-          OSETAdSDK.keyAdHeight: adHeight,
-        });
-  }
-
-  @override
-  onAdLoadCallback(OSETNativeAd osetAd) {
-    osetAd.nativeAdWidget = OSETNativeWidget(
-        osetNativeAd: osetAd, viewType: OSETAdSDK.viewTypeOSETNativeAd);
-    return super.onAdLoadCallback(osetAd);
+    load(posId: posId, methodName: OSETAdSDK.methodLoadNativeAd, arguments: {
+      OSETAdSDK.keyPosId: posId,
+      OSETAdSDK.keyAdWidth: adWidth,
+    });
   }
 
   @override
   OSETNativeAd createOSETAd(
       {required String adId, required Map<String, dynamic>? arguments}) {
-    return OSETNativeAd(adId: adId,
-        posId: arguments?[OSETAdSDK.keyPosId],
-        adWidth: arguments?[OSETAdSDK.keyAdWidth],
-        adHeight: arguments?[OSETAdSDK.keyAdHeight]);
+    return OSETNativeAd(
+      adId: adId,
+      posId: arguments?[OSETAdSDK.keyPosId],
+      adWidth: arguments?[OSETAdSDK.keyAdWidth] ?? double.infinity,
+    );
   }
 
+  @override
+  onAdLoadCallback(OSETNativeAd osetAd) {
+    osetAd.globalKey = GlobalKey();
+    osetAd.nativeAdWidget = OSETNativeWidget(
+        key: osetAd.globalKey,
+        osetNativeAd: osetAd,
+        viewType: OSETAdSDK.viewTypeOSETNativeAd);
+    return super.onAdLoadCallback(osetAd);
+  }
+
+  @override
+  onAdCloseCallback(OSETNativeAd osetAd) {
+    if (osetAd.refreshAdClosed()) {
+      _checkUpdateWidget(osetAd);
+    }
+    return super.onAdCloseCallback(osetAd);
+  }
+
+  /// 广告视图测量回调
+  onAdMeasured(OSETNativeAd osetAd, double width, double height) {
+    if (osetAd.refreshAdHeight(height)) {
+      _checkUpdateWidget(osetAd);
+    }
+  }
+
+  /// 尝试更新广告视图
+  void _checkUpdateWidget(OSETNativeAd osetAd) {
+    var mounted = osetAd.globalKey?.currentState?.mounted ?? false;
+    if (mounted) {
+      osetAd.globalKey?.currentState?.update();
+    }
+  }
 }

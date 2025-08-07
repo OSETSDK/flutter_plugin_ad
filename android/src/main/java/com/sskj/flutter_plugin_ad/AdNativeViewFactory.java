@@ -1,10 +1,15 @@
 package com.sskj.flutter_plugin_ad;
 
 import android.content.Context;
+import android.text.TextUtils;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.sskj.flutter_plugin_ad.ad.OSETNativeExpressAdWidget;
+
+import java.util.HashMap;
 import java.util.Map;
 
 import io.flutter.plugin.common.StandardMessageCodec;
@@ -16,28 +21,46 @@ import io.flutter.plugin.platform.PlatformViewFactory;
  */
 @SuppressWarnings("unchecked")
 public class AdNativeViewFactory extends PlatformViewFactory {
-    @NonNull
-    private final String viewName;// View 名字
-    private final PluginAdSetDelegate pluginDelegate; // 插件代理类
+    private static final String TAG = "adset_plugin";
+    private final Map<String, OSETNativeExpressAdWidget> adMap = new HashMap<>();
 
-    public AdNativeViewFactory(String viewName, @NonNull PluginAdSetDelegate pluginDelegate) {
+    public AdNativeViewFactory() {
         super(StandardMessageCodec.INSTANCE);
-        this.viewName = viewName;
-        this.pluginDelegate = pluginDelegate;
     }
 
     @NonNull
     @Override
     public PlatformView create(@NonNull Context context, int id, @Nullable Object args) {
-        final Map<String, Object> creationParams = (Map<String, Object>) args;
-        if (this.viewName.equals("flutter_plugin_ad_native")) {
-            return new AdNativeView(context, id, creationParams, pluginDelegate);
+        Log.d(TAG, "创建工厂: " + args);
+        String adId = "";
+        double adWidth = 0;
+        try {
+            if (args != null) {
+                adId = (String) ((Map<String, Object>) args).get("adId");
+                adWidth = (double) ((Map<String, Object>) args).get("adWidth");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        return null;
-//        else {
-//            return new RecycleAdView(context, id, creationParams, pluginDelegate);
-//        }
+        if (TextUtils.isEmpty(adId)) {
+            return null;
+        }
+        OSETNativeExpressAdWidget platformView = adMap.get(adId);
+        if (platformView != null) {
+            return platformView;
+        }
 
+        OSETNativeExpressAdWidget adWidget = new OSETNativeExpressAdWidget(context, adId, adWidth);
+        adMap.put(adId, adWidget);
+        return adWidget;
+    }
 
+    public void release(String adId) {
+        OSETNativeExpressAdWidget platformView = adMap.get(adId);
+
+        if (platformView != null) {
+            platformView.release();
+            adMap.remove(adId);
+        }
     }
 }

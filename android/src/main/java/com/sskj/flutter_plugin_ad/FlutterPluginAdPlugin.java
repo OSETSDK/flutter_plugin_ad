@@ -1,5 +1,7 @@
 package com.sskj.flutter_plugin_ad;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
@@ -16,10 +18,7 @@ import io.flutter.plugin.common.MethodChannel.Result;
  */
 @SuppressWarnings("unchecked")
 public class FlutterPluginAdPlugin implements FlutterPlugin, MethodCallHandler, ActivityAware {
-    /// The MethodChannel that will the communication between Flutter and native Android
-    ///
-    /// This local reference serves to register the plugin with the Flutter Engine and unregister it
-    /// when the Flutter Engine is detached from the Activity
+    private static final String TAG = "adset_plugin";
     private MethodChannel channel;
     private EventChannel eventChannel;
 
@@ -38,28 +37,8 @@ public class FlutterPluginAdPlugin implements FlutterPlugin, MethodCallHandler, 
 
     @Override
     public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
-        if (call.method.equals("getPlatformVersion")) {
-            delegate.getPlatformVersion(call, result);
-        } else if (call.method.equals("initAd")) {
-            delegate.initAd(call, result);
-        } else if (call.method.equals("checkAndReqPermission")) {
-            delegate.checkAndReqPermission(call, result);
-        } else if (call.method.equals("showSplashAd")) {
-            delegate.showSplashAd(call, result);
-        } else if (call.method.equals("showInterstitialAd")) {
-            delegate.showInterstitialAd(call, result);
-        } else if (call.method.equals("showFullscreenVideoAd")) {
-            delegate.showFullscreenVideoAd(call, result);
-        } else if (call.method.equals("startLoadRewardVideoAd")) {
-            delegate.startLoadRewardVideo(call, result);
-        } else if (call.method.equals("showRewardVideoAd")) {
-            delegate.showRewardVideo(call, result);
-        } else if (call.method.equals("showVideoPage")) {
-            delegate.showVideoPage(call, result);
-        } else if (call.method.equals("showKsVideoFragment")) {
-            delegate.showKsVideoFragment(call, result);
-        } else {
-            result.notImplemented();
+        if (delegate != null) {
+            delegate.onMethodCall(call, result);
         }
     }
 
@@ -71,13 +50,11 @@ public class FlutterPluginAdPlugin implements FlutterPlugin, MethodCallHandler, 
 
     @Override
     public void onAttachedToActivity(@NonNull ActivityPluginBinding binding) {
-
-        this.delegate = new PluginAdSetDelegate(binding.getActivity(), bind);
+        delegate = PluginAdSetDelegate.getInstance();
+        delegate.init(binding.getActivity(), bind);
         binding.addActivityResultListener(delegate);
         binding.addRequestPermissionsResultListener(delegate);
         eventChannel.setStreamHandler(delegate);
-        this.delegate.registerBannerView();
-        this.delegate.registerNativeView();
     }
 
     @Override

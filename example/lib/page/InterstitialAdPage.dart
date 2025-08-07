@@ -9,10 +9,10 @@ class InterstitialAdPage extends StatefulWidget {
   const InterstitialAdPage({super.key});
 
   @override
-  State<StatefulWidget> createState() => _SplashState();
+  State<StatefulWidget> createState() => _InterstitialState();
 }
 
-class _SplashState extends State<InterstitialAdPage> {
+class _InterstitialState extends State<InterstitialAdPage> {
   final OSETInterstitialAdLoader _interstitialAdLoader = OSETInterstitialAdLoader();
 
   @override

@@ -1,7 +1,7 @@
-package com.sskj.flutter_plugin_ad;
+package com.sskj.flutter_plugin_ad.config;
 
 /// 事件类型
-public class AdEventChannel {
+public class OSETAdEvent {
     // 未知
     public static final String unknown = "unknown";
     // 广告加载完毕
@@ -18,4 +18,6 @@ public class AdEventChannel {
     public static final String onReward = "onReward";
     // 超过广告时间
     public static final String onAdTimeOver = "onAdTimeOver";
+
+    public static final String onAdMeasured = "OnAdMeasured";
 }

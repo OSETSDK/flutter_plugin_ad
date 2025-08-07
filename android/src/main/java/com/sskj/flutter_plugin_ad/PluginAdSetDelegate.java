@@ -11,6 +11,8 @@ import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
+import androidx.annotation.NonNull;
+
 import com.jiagu.sdk.OSETSDKProtected;
 import com.kc.openset.VideoContentConfig;
 import com.kc.openset.ad.full.OSETFullAd;
@@ -34,6 +36,8 @@ import com.kc.openset.listener.OSETInitListener;
 import com.kc.openset.video.OSETVideoContent;
 import com.kc.openset.video.OSETVideoContentTaskListener;
 import com.sskj.flutter_plugin_ad.callback.ClickItem;
+import com.sskj.flutter_plugin_ad.config.OSETAdEvent;
+import com.sskj.flutter_plugin_ad.listener.OnAdReleaseListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -45,15 +49,20 @@ import io.flutter.plugin.common.EventChannel;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.PluginRegistry;
+import io.flutter.plugin.common.MethodChannel.Result;
 
 
 public class PluginAdSetDelegate implements PluginRegistry.ActivityResultListener, EventChannel.StreamHandler, PluginRegistry.RequestPermissionsResultListener {
 
-    private final String TAG = PluginAdSetDelegate.class.getSimpleName();
+    private final String TAG = "adset_plugin";
     public FlutterPlugin.FlutterPluginBinding bind;
     public Activity activity;
 
     private EventChannel.EventSink _eventChannel;
+    private AdBannerViewFactory bannerAdFactory;
+    private AdNativeViewFactory nativeAdFactory;
+    private final List<OnAdReleaseListener> onAdReleaseListenerList = new ArrayList<>();
+
     // 请求权限 code
     private static final int PERMISSIONS_REQUEST_CODE = 1024;
     // 开屏广告 code
@@ -67,11 +76,122 @@ public class PluginAdSetDelegate implements PluginRegistry.ActivityResultListene
     public static final String AD_EVENT = "adEvent";
     public static final String AD_MSG = "adMsg";
 
-    public PluginAdSetDelegate(Activity activity, FlutterPlugin.FlutterPluginBinding bind) {
-        this.bind = bind;
-        this.activity = activity;
+    private static volatile PluginAdSetDelegate instance;
+
+    private PluginAdSetDelegate() {
     }
 
+    public static PluginAdSetDelegate getInstance() {
+        if (instance == null) {
+            synchronized (PluginAdSetDelegate.class) {
+                if (instance == null) {
+                    instance = new PluginAdSetDelegate();
+                }
+            }
+        }
+        return instance;
+    }
+
+    public void init(Activity activity, FlutterPlugin.FlutterPluginBinding bind) {
+        this.bind = bind;
+        this.activity = activity;
+        registerViewFactory();
+    }
+
+    /**
+     * 注册广告被释放监听
+     */
+    public void registerOnAdReleaseListener(@NonNull OnAdReleaseListener listener) {
+        onAdReleaseListenerList.add(listener);
+    }
+
+    /**
+     * 注销广告释放监听
+     */
+    public void unregisterOnAdReleaseListener(@NonNull OnAdReleaseListener listener) {
+        onAdReleaseListenerList.remove(listener);
+    }
+
+    /**
+     * 遍历找到指定广告，并释放
+     *
+     * @param adId 广告ID
+     */
+    public void loopNotifyOnAdRelease(String adId) {
+        Log.d(TAG, "开始释放广告, adId: " + adId);
+        for (OnAdReleaseListener listener : onAdReleaseListenerList) {
+            listener.onAdRelease(adId);
+        }
+    }
+
+    public void registerViewFactory() {
+        try {
+            bannerAdFactory = new AdBannerViewFactory("flutter_plugin_ad_banner", this);
+            this.bind.getPlatformViewRegistry()
+                    .registerViewFactory("flutter_plugin_ad_banner", bannerAdFactory);
+            nativeAdFactory = new AdNativeViewFactory();
+            this.bind.getPlatformViewRegistry()
+                    .registerViewFactory("flutter_plugin_ad_native", nativeAdFactory);
+            Log.d(TAG, "注册原生信息流、banner工厂: ");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * flutter调用原生方法
+     */
+    public void onMethodCall(MethodCall call, Result result) {
+        String posId = call.argument(POS_ID);
+        String adId = call.argument(AD_ID);
+        Log.d(TAG, "flutter调用原生方法：" + call.method + ", posId：" + posId + ", adId：" + adId);
+        switch (call.method) {
+            case "getPlatformVersion":
+                getPlatformVersion(call, result);
+                break;
+            case "initAd":
+                initAd(call, result);
+                break;
+            case "checkAndReqPermission":
+                checkAndReqPermission(call, result);
+                break;
+            case "showSplashAd":
+                showSplashAd(call, result);
+                break;
+            case "showInterstitialAd":
+                showInterstitialAd(call, result);
+                break;
+            case "showFullscreenVideoAd":
+                showFullscreenVideoAd(call, result);
+                break;
+            case "startLoadRewardVideoAd":
+                startLoadRewardVideo(call, result);
+                break;
+            case "showRewardVideoAd":
+                showRewardVideo(call, result);
+                break;
+            case "loadBannerAd":
+
+                break;
+            case "loadNativeAd":
+                OSETNativeAdManager.getInstance().loadNativeExpressAd(activity, posId, adId);
+                break;
+            case "showVideoPage":
+                showVideoPage(call, result);
+                break;
+            case "showKsVideoFragment":
+                showKsVideoFragment(call, result);
+                break;
+            case "releaseAd":
+                // 释放广告
+                loopNotifyOnAdRelease(adId);
+                result.success(true);
+                break;
+            default:
+                result.notImplemented();
+                break;
+        }
+    }
     /**
      * 初始化
      *
@@ -134,7 +254,7 @@ public class PluginAdSetDelegate implements PluginRegistry.ActivityResultListene
         OSETSplash.getInstance().setContext(activity).setPosId(posId).loadAd(new OSETSplashAdLoadListener() {
             @Override
             public void onLoadSuccess(OSETSplashAd osetSplashAd) {
-                postEvent(adId, AdEventChannel.onAdLoaded);
+                postEvent(adId, OSETAdEvent.onAdLoaded);
                 osetSplashAd.showAd(activity, frameLayout, new OSETSplashListener() {
                     @Override
                     public void onAdDetailViewClosed() {
@@ -143,24 +263,24 @@ public class PluginAdSetDelegate implements PluginRegistry.ActivityResultListene
 
                     @Override
                     public void onClick() {
-                        postEvent(adId, AdEventChannel.onAdClicked);
+                        postEvent(adId, OSETAdEvent.onAdClicked);
                     }
 
                     @Override
                     public void onClose() {
-                        postEvent(adId, AdEventChannel.onAdClosed);
+                        postEvent(adId, OSETAdEvent.onAdClosed);
                         fl.removeView(frameLayout);
                         osetSplashAd.destroy();
                     }
 
                     @Override
                     public void onShow() {
-                        postEvent(adId, AdEventChannel.onAdExposure);
+                        postEvent(adId, OSETAdEvent.onAdExposure);
                     }
 
                     @Override
                     public void onError(String s, String s1) {
-                        postEvent(adId, "广告显示错误：" + s + ", " + s1, AdEventChannel.onAdError);
+                        postEvent(adId, "广告显示错误：" + s + ", " + s1, OSETAdEvent.onAdError);
                         fl.removeView(frameLayout);
                     }
                 });
@@ -168,7 +288,7 @@ public class PluginAdSetDelegate implements PluginRegistry.ActivityResultListene
 
             @Override
             public void onLoadFail(String s, String s1) {
-                postEvent(adId, "广告加载失败：" + s + ", " + s1, AdEventChannel.onAdError);
+                postEvent(adId, "广告加载失败：" + s + ", " + s1, OSETAdEvent.onAdError);
                 fl.removeView(frameLayout);
             }
         });
@@ -190,31 +310,31 @@ public class PluginAdSetDelegate implements PluginRegistry.ActivityResultListene
 
                     @Override
                     public void onLoadFail(String s, String s1) {
-                        postEvent(adId, "广告加载失败：" + s + ", " + s1, AdEventChannel.onAdError);
+                        postEvent(adId, "广告加载失败：" + s + ", " + s1, OSETAdEvent.onAdError);
                     }
 
                     @Override
                     public void onLoadSuccess(OSETInterstitialAd osetInterstitialAd) {
-                        postEvent(adId, AdEventChannel.onAdLoaded);
+                        postEvent(adId, OSETAdEvent.onAdLoaded);
                         osetInterstitialAd.showAd(activity, new OSETInterstitialListener() {
                             @Override
                             public void onShow() {
-                                postEvent(adId, AdEventChannel.onAdExposure);
+                                postEvent(adId, OSETAdEvent.onAdExposure);
                             }
 
                             @Override
                             public void onError(String s, String s1) {
-                                postEvent(adId, "广告显示错误：" + s + ", " + s1, AdEventChannel.onAdError);
+                                postEvent(adId, "广告显示错误：" + s + ", " + s1, OSETAdEvent.onAdError);
                             }
 
                             @Override
                             public void onClick() {
-                                postEvent(adId, AdEventChannel.onAdClicked);
+                                postEvent(adId, OSETAdEvent.onAdClicked);
                             }
 
                             @Override
                             public void onClose() {
-                                postEvent(adId, AdEventChannel.onAdClosed);
+                                postEvent(adId, OSETAdEvent.onAdClosed);
                             }
                         });
                     }
@@ -236,7 +356,7 @@ public class PluginAdSetDelegate implements PluginRegistry.ActivityResultListene
                 .loadAd(new OSETFullAdLoadListener() {
                     @Override
                     public void onLoadSuccess(OSETFullAd osetFullAd) {
-                        postEvent(adId, AdEventChannel.onAdLoaded);
+                        postEvent(adId, OSETAdEvent.onAdLoaded);
                         osetFullAd.showAd(activity, new OSETFullVideoListener() {
 
                             @Override
@@ -246,22 +366,22 @@ public class PluginAdSetDelegate implements PluginRegistry.ActivityResultListene
 
                             @Override
                             public void onError(String s, String s1) {
-                                postEvent(adId, "广告显示错误：" + s + ", " + s1, AdEventChannel.onAdError);
+                                postEvent(adId, "广告显示错误：" + s + ", " + s1, OSETAdEvent.onAdError);
                             }
 
                             @Override
                             public void onClick() {
-                                postEvent(adId, AdEventChannel.onAdClicked);
+                                postEvent(adId, OSETAdEvent.onAdClicked);
                             }
 
                             @Override
                             public void onClose() {
-                                postEvent(adId, AdEventChannel.onAdClosed);
+                                postEvent(adId, OSETAdEvent.onAdClosed);
                             }
 
                             @Override
                             public void onShow() {
-                                postEvent(adId, AdEventChannel.onAdExposure);
+                                postEvent(adId, OSETAdEvent.onAdExposure);
                             }
 
                             @Override
@@ -274,7 +394,7 @@ public class PluginAdSetDelegate implements PluginRegistry.ActivityResultListene
 
                     @Override
                     public void onLoadFail(String s, String s1) {
-                        postEvent(adId, "广告加载错误：" + s + ", " + s1, AdEventChannel.onAdError);
+                        postEvent(adId, "广告加载错误：" + s + ", " + s1, OSETAdEvent.onAdError);
                     }
                 });
         result.success(true);
@@ -313,22 +433,22 @@ public class PluginAdSetDelegate implements PluginRegistry.ActivityResultListene
                 .loadAd(new OSETRewardAdLoadListener() {
                     @Override
                     public void onLoadSuccess(OSETRewardAd osetRewardAd) {
-                        postEvent(adId, AdEventChannel.onAdLoaded);
+                        postEvent(adId, OSETAdEvent.onAdLoaded);
                         osetRewardAd.showAd(activity, new OSETRewardListener() {
                             @Override
                             public void onClick() {
-                                postEvent(adId, AdEventChannel.onAdClicked);
+                                postEvent(adId, OSETAdEvent.onAdClicked);
                             }
 
                             @Override
                             public void onClose() {
-                                postEvent(adId, AdEventChannel.onAdClosed);
+                                postEvent(adId, OSETAdEvent.onAdClosed);
                             }
 
                             @Override
                             public void onReward() {
                                 // 获得奖励后回调
-                                postEvent(adId, AdEventChannel.onReward);
+                                postEvent(adId, OSETAdEvent.onReward);
                             }
 
                             @Override
@@ -337,7 +457,7 @@ public class PluginAdSetDelegate implements PluginRegistry.ActivityResultListene
 
                             @Override
                             public void onShow() {
-                                postEvent(adId, AdEventChannel.onAdExposure);
+                                postEvent(adId, OSETAdEvent.onAdExposure);
                             }
 
                             @Override
@@ -350,14 +470,14 @@ public class PluginAdSetDelegate implements PluginRegistry.ActivityResultListene
 
                             @Override
                             public void onError(String s, String s1) {
-                                postEvent(adId, "广告显示错误：" + s + ", " + s1, AdEventChannel.onAdError);
+                                postEvent(adId, "广告显示错误：" + s + ", " + s1, OSETAdEvent.onAdError);
                             }
                         });
                     }
 
                     @Override
                     public void onLoadFail(String s, String s1) {
-                        postEvent(adId, "广告加载错误：" + s + ", " + s1, AdEventChannel.onAdError);
+                        postEvent(adId, "广告加载错误：" + s + ", " + s1, OSETAdEvent.onAdError);
                     }
                 });
         result.success(true);
@@ -383,21 +503,21 @@ public class PluginAdSetDelegate implements PluginRegistry.ActivityResultListene
             @Override
             public void onClose() {
                 //关闭回调
-                postEvent(adId, AdEventChannel.onAdClosed);
+                postEvent(adId, OSETAdEvent.onAdClosed);
             }
 
             @Override
             public void onLoadFail(String s, String s1) {
                 Log.e(TAG, "code:" + s + "----message:" + s1);
                 // 出错了
-                postEvent(adId, "code: " + s + ", msg: " + s1, AdEventChannel.onAdError);
+                postEvent(adId, "code: " + s + ", msg: " + s1, OSETAdEvent.onAdError);
             }
 
             @Override
             public void onTimeOver() {
                 //key用做校验
                 // 验证地址 http://open-set-api.shenshiads.com/reward/check/<key>（返回数据: {"code": 0}，code为0表示验证成
-                postEvent(adId, AdEventChannel.onAdTimeOver);
+                postEvent(adId, OSETAdEvent.onAdTimeOver);
             }
 
             @Override
@@ -454,23 +574,15 @@ public class PluginAdSetDelegate implements PluginRegistry.ActivityResultListene
         });
     }
 
-
-    /**
-     * 展示 Banner 广告
-     */
-    public void registerBannerView() {
-        bind.getPlatformViewRegistry()
-                .registerViewFactory("flutter_plugin_ad_banner", new AdBannerViewFactory("flutter_plugin_ad_banner", this));
+    @NonNull
+    public AdBannerViewFactory getOSETBannerAdFactory() {
+        return bannerAdFactory;
     }
 
-    /**
-     * 展示原生广告
-     */
-    public void registerNativeView() {
-        bind.getPlatformViewRegistry()
-                .registerViewFactory("flutter_plugin_ad_native", new AdNativeViewFactory("flutter_plugin_ad_native", this));
+    @NonNull
+    public AdNativeViewFactory getOSETNativeAdFactory() {
+        return nativeAdFactory;
     }
-
 
     /**
      * demo
@@ -534,7 +646,7 @@ public class PluginAdSetDelegate implements PluginRegistry.ActivityResultListene
 
     ///  发送事件
     public void postEvent(String adId, String adEvent) {
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, Object> map = new HashMap<String, Object>();
         map.put(AD_ID, adId);
         map.put(AD_EVENT, adEvent);
         postEvent(map);
@@ -542,7 +654,7 @@ public class PluginAdSetDelegate implements PluginRegistry.ActivityResultListene
 
     ///  发送事件
     public void postEvent(String adId, String msg, String adEvent) {
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, Object> map = new HashMap<String, Object>();
         map.put(AD_ID, adId);
         map.put(AD_MSG, msg);
         map.put(AD_EVENT, adEvent);
@@ -550,7 +662,7 @@ public class PluginAdSetDelegate implements PluginRegistry.ActivityResultListene
     }
 
     /// 发送事件消息给flutter
-    public void postEvent(Map<String, String> map) {
+    public void postEvent(Map<String, Object> map) {
         if (_eventChannel != null && map != null) {
             Log.d(TAG, "postEvent map:" + map.toString());
             _eventChannel.success(map);
