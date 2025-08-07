@@ -1,19 +1,15 @@
 package com.sskj.flutter_plugin_ad;
 
-import androidx.fragment.app.FragmentManager;
-
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 
 import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.bottomnavigation.LabelVisibilityMode;
-import com.kc.openset.VideoContentConfig;
 import com.kc.openset.video.OSETVideoContent;
 import com.kc.openset.video.OSETVideoContentListener;
 import com.kc.openset.video.VideoContentResult;

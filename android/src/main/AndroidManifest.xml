@@ -21,11 +21,11 @@
         tools:replace="android:allowBackup,android:networkSecurityConfig">
 
         <!--  启动屏广告 -->
-        <activity
-            android:name=".AdSplashActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize"
-            android:screenOrientation="portrait"
-            android:theme="@android:style/Theme.Holo.NoActionBar.Fullscreen" />
+<!--        <activity-->
+<!--            android:name=".AdSplashActivity"-->
+<!--            android:configChanges="keyboardHidden|orientation|screenSize"-->
+<!--            android:screenOrientation="portrait"-->
+<!--            android:theme="@android:style/Theme.Holo.NoActionBar.Fullscreen" />-->
 
         <!--        <activity-->
         <!--            android:name="com.sigmob.sdk.base.common.AdActivity"-->

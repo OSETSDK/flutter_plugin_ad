@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
@@ -33,14 +34,12 @@ import com.kc.openset.listener.OSETInitListener;
 import com.kc.openset.video.OSETVideoContent;
 import com.kc.openset.video.OSETVideoContentTaskListener;
 import com.sskj.flutter_plugin_ad.callback.ClickItem;
-import com.sskj.flutter_plugin_ad.entity.AdEvent;
-import com.sskj.flutter_plugin_ad.entity.AdType;
-import com.sskj.flutter_plugin_ad.entity.EventType;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import io.flutter.Log;
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.plugin.common.EventChannel;
 import io.flutter.plugin.common.MethodCall;
@@ -54,25 +53,23 @@ public class PluginAdSetDelegate implements PluginRegistry.ActivityResultListene
     public FlutterPlugin.FlutterPluginBinding bind;
     public Activity activity;
 
-    private MethodChannel.Result pendingResult;
-    private EventChannel.EventSink eventSink;
+    private EventChannel.EventSink _eventChannel;
     // 请求权限 code
     private static final int PERMISSIONS_REQUEST_CODE = 1024;
     // 开屏广告 code
     private static final int SHOW_SPLASH_AD_REQUEST_CODE = 1025;
     // 广告参数
+    ///  广告位ID
+    public static final String POS_ID = "posId";
+    ///  广告唯一ID
     public static final String AD_ID = "adId";
     public static final String USER_ID = "userId";
-    private static PluginAdSetDelegate _instance;
-
-    public static PluginAdSetDelegate getInstance() {
-        return _instance;
-    }
+    public static final String AD_EVENT = "adEvent";
+    public static final String AD_MSG = "adMsg";
 
     public PluginAdSetDelegate(Activity activity, FlutterPlugin.FlutterPluginBinding bind) {
         this.bind = bind;
         this.activity = activity;
-        _instance = this;
     }
 
     /**
@@ -122,8 +119,9 @@ public class PluginAdSetDelegate implements PluginRegistry.ActivityResultListene
      * @param result Result
      */
     public void showSplashAd(MethodCall call, MethodChannel.Result result) {
+        String posId = call.argument(POS_ID);
         String adId = call.argument(AD_ID);
-        if (TextUtils.isEmpty(adId)) {
+        if (TextUtils.isEmpty(posId)) {
             result.error("-300", "参数错误，posId 不能为空", new Exception("参数错误，posId 不能为空"));
             return;
         }
@@ -133,9 +131,10 @@ public class PluginAdSetDelegate implements PluginRegistry.ActivityResultListene
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
         frameLayout.setLayoutParams(params);
         fl.addView(frameLayout);
-        OSETSplash.getInstance().setContext(activity).setPosId(adId).loadAd(new OSETSplashAdLoadListener() {
+        OSETSplash.getInstance().setContext(activity).setPosId(posId).loadAd(new OSETSplashAdLoadListener() {
             @Override
             public void onLoadSuccess(OSETSplashAd osetSplashAd) {
+                postEvent(adId, AdEventChannel.onAdLoaded);
                 osetSplashAd.showAd(activity, frameLayout, new OSETSplashListener() {
                     @Override
                     public void onAdDetailViewClosed() {
@@ -144,24 +143,24 @@ public class PluginAdSetDelegate implements PluginRegistry.ActivityResultListene
 
                     @Override
                     public void onClick() {
-                        PluginAdSetDelegate.getInstance().addEvent(new AdEvent(EventType.onAdClicked, "", AdType.SPLASH));
+                        postEvent(adId, AdEventChannel.onAdClicked);
                     }
 
                     @Override
                     public void onClose() {
-                        PluginAdSetDelegate.getInstance().addEvent(new AdEvent(EventType.onAdClosed, "", AdType.SPLASH));
+                        postEvent(adId, AdEventChannel.onAdClosed);
                         fl.removeView(frameLayout);
                         osetSplashAd.destroy();
                     }
 
                     @Override
                     public void onShow() {
-                        PluginAdSetDelegate.getInstance().addEvent(new AdEvent("onAdShow", "", AdType.SPLASH));
+                        postEvent(adId, AdEventChannel.onAdExposure);
                     }
 
                     @Override
                     public void onError(String s, String s1) {
-                        PluginAdSetDelegate.getInstance().addEvent(new AdEvent(EventType.onAdClicked, "错误：" + s + ", " + s1, AdType.SPLASH));
+                        postEvent(adId, "广告显示错误：" + s + ", " + s1, AdEventChannel.onAdError);
                         fl.removeView(frameLayout);
                     }
                 });
@@ -169,51 +168,53 @@ public class PluginAdSetDelegate implements PluginRegistry.ActivityResultListene
 
             @Override
             public void onLoadFail(String s, String s1) {
-                PluginAdSetDelegate.getInstance().addEvent(new AdEvent(EventType.onAdError, "", AdType.SPLASH));
+                postEvent(adId, "广告加载失败：" + s + ", " + s1, AdEventChannel.onAdError);
                 fl.removeView(frameLayout);
             }
         });
     }
 
     public void showInterstitialAd(MethodCall call, MethodChannel.Result result) {
+        String posId = call.argument(POS_ID);
         String adId = call.argument(AD_ID);
-        if (TextUtils.isEmpty(adId)) {
+        if (TextUtils.isEmpty(posId)) {
             result.error("-300", "参数错误，posId 不能为空", new Exception("参数错误，posId 不能为空"));
             return;
         }
         //在首页中OnCreate调用以下代码可以开始加载广告并缓存
         OSETInterstitial.getInstance()
                 .setContext(activity)
-                .setPosId(adId)
+                .setPosId(posId)
                 .loadAd(new OSETInterstitialAdLoadListener() {
 
 
                     @Override
                     public void onLoadFail(String s, String s1) {
-
+                        postEvent(adId, "广告加载失败：" + s + ", " + s1, AdEventChannel.onAdError);
                     }
 
                     @Override
                     public void onLoadSuccess(OSETInterstitialAd osetInterstitialAd) {
+                        postEvent(adId, AdEventChannel.onAdLoaded);
                         osetInterstitialAd.showAd(activity, new OSETInterstitialListener() {
                             @Override
                             public void onShow() {
-                                addEvent(new AdEvent(EventType.onAdExposure, "", AdType.INTERSTITIAL));
+                                postEvent(adId, AdEventChannel.onAdExposure);
                             }
 
                             @Override
                             public void onError(String s, String s1) {
-                                addEvent(new AdEvent(EventType.onAdError, "", AdType.INTERSTITIAL));
+                                postEvent(adId, "广告显示错误：" + s + ", " + s1, AdEventChannel.onAdError);
                             }
 
                             @Override
                             public void onClick() {
-                                addEvent(new AdEvent(EventType.onAdClicked, "", AdType.INTERSTITIAL));
+                                postEvent(adId, AdEventChannel.onAdClicked);
                             }
 
                             @Override
                             public void onClose() {
-                                addEvent(new AdEvent(EventType.onAdClosed, "", AdType.INTERSTITIAL));
+                                postEvent(adId, AdEventChannel.onAdClosed);
                             }
                         });
                     }
@@ -222,18 +223,20 @@ public class PluginAdSetDelegate implements PluginRegistry.ActivityResultListene
     }
 
     public void showFullscreenVideoAd(MethodCall call, MethodChannel.Result result) {
+        String posId = call.argument(POS_ID);
         String adId = call.argument(AD_ID);
-        if (TextUtils.isEmpty(adId)) {
+        if (TextUtils.isEmpty(posId)) {
             result.error("-300", "参数错误，posId 不能为空", new Exception("参数错误，posId 不能为空"));
             return;
         }
         //在首页中OnCreate调用以下代码可以开始加载广告并缓存
         OSETFullVideo.getInstance()
                 .setContext(activity)
-                .setPosId(adId)
+                .setPosId(posId)
                 .loadAd(new OSETFullAdLoadListener() {
                     @Override
                     public void onLoadSuccess(OSETFullAd osetFullAd) {
+                        postEvent(adId, AdEventChannel.onAdLoaded);
                         osetFullAd.showAd(activity, new OSETFullVideoListener() {
 
                             @Override
@@ -243,22 +246,22 @@ public class PluginAdSetDelegate implements PluginRegistry.ActivityResultListene
 
                             @Override
                             public void onError(String s, String s1) {
-                                addEvent(new AdEvent(EventType.onAdError, "错误：" + s + ", " + s1, AdType.FULL_SCREEN_VIDEO));
+                                postEvent(adId, "广告显示错误：" + s + ", " + s1, AdEventChannel.onAdError);
                             }
 
                             @Override
                             public void onClick() {
-                                addEvent(new AdEvent(EventType.onAdClicked, "", AdType.FULL_SCREEN_VIDEO));
+                                postEvent(adId, AdEventChannel.onAdClicked);
                             }
 
                             @Override
                             public void onClose() {
-                                addEvent(new AdEvent(EventType.onAdClosed, "", AdType.FULL_SCREEN_VIDEO));
+                                postEvent(adId, AdEventChannel.onAdClosed);
                             }
 
                             @Override
                             public void onShow() {
-                                addEvent(new AdEvent(EventType.onAdExposure, "", AdType.FULL_SCREEN_VIDEO));
+                                postEvent(adId, AdEventChannel.onAdExposure);
                             }
 
                             @Override
@@ -271,59 +274,61 @@ public class PluginAdSetDelegate implements PluginRegistry.ActivityResultListene
 
                     @Override
                     public void onLoadFail(String s, String s1) {
-                        addEvent(new AdEvent(EventType.onAdError, "", AdType.FULL_SCREEN_VIDEO));
+                        postEvent(adId, "广告加载错误：" + s + ", " + s1, AdEventChannel.onAdError);
                     }
                 });
         result.success(true);
     }
 
     public void startLoadRewardVideo(MethodCall call, MethodChannel.Result result) {
+        String posId = call.argument(POS_ID);
         String adId = call.argument(AD_ID);
         String userId = call.argument(USER_ID);
-        if (TextUtils.isEmpty(adId)) {
+        if (TextUtils.isEmpty(posId)) {
             result.error("-300", "参数错误，posId 不能为空", new Exception("参数错误，posId 不能为空"));
             return;
         }
         //这一步建议在首页进行初始化并开启缓存,减少第一次展示广告的时间。并且在首页onDestroy里面调用destroy()方法释放资源
         OSETRewardVideo.getInstance()
                 .setContext(activity)
-                .setPosId(adId)
+                .setPosId(posId)
                 .setUserId(userId)
                 .startLoad();
         result.success(true);
     }
 
     public void showRewardVideo(MethodCall call, MethodChannel.Result result) {
-
+        String posId = call.argument(POS_ID);
         String adId = call.argument(AD_ID);
         String userId = call.argument(USER_ID);
-        if (TextUtils.isEmpty(adId)) {
+        if (TextUtils.isEmpty(posId)) {
             result.error("-300", "参数错误，posId 不能为空", new Exception("参数错误，posId 不能为空"));
             return;
         }
         //这一步建议在首页进行初始化并开启缓存,减少第一次展示广告的时间。并且在首页onDestroy里面调用destroy()方法释放资源
         OSETRewardVideo.getInstance()
                 .setContext(activity)
-                .setPosId(adId)
+                .setPosId(posId)
                 .setUserId(userId)
                 .loadAd(new OSETRewardAdLoadListener() {
                     @Override
                     public void onLoadSuccess(OSETRewardAd osetRewardAd) {
+                        postEvent(adId, AdEventChannel.onAdLoaded);
                         osetRewardAd.showAd(activity, new OSETRewardListener() {
                             @Override
                             public void onClick() {
-                                addEvent(new AdEvent(EventType.onAdClicked, "", AdType.REWARD_VIDEO));
+                                postEvent(adId, AdEventChannel.onAdClicked);
                             }
 
                             @Override
                             public void onClose() {
-                                addEvent(new AdEvent(EventType.onAdClosed, "", AdType.REWARD_VIDEO));
+                                postEvent(adId, AdEventChannel.onAdClosed);
                             }
 
                             @Override
                             public void onReward() {
                                 // 获得奖励后回调
-                                addEvent(new AdEvent(EventType.onReward, "", AdType.REWARD_VIDEO));
+                                postEvent(adId, AdEventChannel.onReward);
                             }
 
                             @Override
@@ -332,7 +337,7 @@ public class PluginAdSetDelegate implements PluginRegistry.ActivityResultListene
 
                             @Override
                             public void onShow() {
-                                addEvent(new AdEvent(EventType.onAdExposure, "", AdType.REWARD_VIDEO));
+                                postEvent(adId, AdEventChannel.onAdExposure);
                             }
 
                             @Override
@@ -345,24 +350,25 @@ public class PluginAdSetDelegate implements PluginRegistry.ActivityResultListene
 
                             @Override
                             public void onError(String s, String s1) {
-                                addEvent(new AdEvent(EventType.onAdError, "错误：" + s + ", " + s1, AdType.REWARD_VIDEO));
+                                postEvent(adId, "广告显示错误：" + s + ", " + s1, AdEventChannel.onAdError);
                             }
                         });
                     }
 
                     @Override
                     public void onLoadFail(String s, String s1) {
-                        addEvent(new AdEvent(EventType.onAdError, "错误：" + s + ", " + s1, AdType.REWARD_VIDEO));
+                        postEvent(adId, "广告加载错误：" + s + ", " + s1, AdEventChannel.onAdError);
                     }
                 });
         result.success(true);
     }
 
     public void showVideoPage(MethodCall call, MethodChannel.Result result) {
+        String posId = call.argument(POS_ID);
         String adId = call.argument(AD_ID);
         int rewardCount = call.argument("rewardCount");
         int rewardDownTime = call.argument("rewardDownTime");
-        if (TextUtils.isEmpty(adId)) {
+        if (TextUtils.isEmpty(posId)) {
             result.error("-300", "参数错误，posId 不能为空", new Exception("参数错误，posId 不能为空"));
             return;
         }
@@ -372,26 +378,26 @@ public class PluginAdSetDelegate implements PluginRegistry.ActivityResultListene
                 .setRewardCount(rewardCount)
                 .setRewardDownTime(rewardDownTime)
                 .build();
-        OSETVideoContent.getInstance().setPosId(adId).showByActivity(activity, videoContentConfig, new OSETVideoContentTaskListener() {
+        OSETVideoContent.getInstance().setPosId(posId).showByActivity(activity, videoContentConfig, new OSETVideoContentTaskListener() {
 
             @Override
             public void onClose() {
                 //关闭回调
-                addEvent(new AdEvent(EventType.onAdClosed, "", AdType.VIDEO_CONTENT));
+                postEvent(adId, AdEventChannel.onAdClosed);
             }
 
             @Override
             public void onLoadFail(String s, String s1) {
                 Log.e(TAG, "code:" + s + "----message:" + s1);
                 // 出错了
-                addEvent(new AdEvent(EventType.onAdError, "code: " + s + ", msg: " + s1, AdType.VIDEO_CONTENT));
+                postEvent(adId, "code: " + s + ", msg: " + s1, AdEventChannel.onAdError);
             }
 
             @Override
             public void onTimeOver() {
                 //key用做校验
                 // 验证地址 http://open-set-api.shenshiads.com/reward/check/<key>（返回数据: {"code": 0}，code为0表示验证成
-                addEvent(new AdEvent(EventType.onAdTimeOver, "", AdType.VIDEO_CONTENT));
+                postEvent(adId, AdEventChannel.onAdTimeOver);
             }
 
             @Override
@@ -427,15 +433,15 @@ public class PluginAdSetDelegate implements PluginRegistry.ActivityResultListene
     }
 
     public void showKsVideoFragment(MethodCall call, MethodChannel.Result result) {
-
+        String posId = call.argument(POS_ID);
         String adId = call.argument(AD_ID);
-        if (TextUtils.isEmpty(adId)) {
+        if (TextUtils.isEmpty(posId)) {
             result.error("-300", "参数错误，posId 不能为空", new Exception("参数错误，posId 不能为空"));
             return;
         }
 
         Intent intent = new Intent(activity, KsAdActivity.class);
-        intent.putExtra(AD_ID, adId);
+        intent.putExtra(AD_ID, posId);
         activity.startActivity(intent);
         activity.overridePendingTransition(0, 0);
         KsAdActivity.onClickItem(new ClickItem() {
@@ -443,8 +449,7 @@ public class PluginAdSetDelegate implements PluginRegistry.ActivityResultListene
             public void selectItem(int index) {
                 Log.e(TAG, "index: " + index);
                 result.success(index);
-                AdEvent adEvent = new AdEvent("KsVideoFragment", index + "");
-                addEvent(adEvent);
+                postEvent(adId, index + "", "KsVideoFragment");
             }
         });
     }
@@ -527,39 +532,39 @@ public class PluginAdSetDelegate implements PluginRegistry.ActivityResultListene
         }
     }
 
-
-    /**
-     * 添加事件
-     *
-     * @param eventType
-     */
-    public void addEvent(String eventType) {
-        Log.d(TAG, "addEvent eventType:" + eventType);
-        if (eventType != null) {
-            addEvent(new AdEvent(eventType));
-        }
+    ///  发送事件
+    public void postEvent(String adId, String adEvent) {
+        Map<String, String> map = new HashMap<String, String>();
+        map.put(AD_ID, adId);
+        map.put(AD_EVENT, adEvent);
+        postEvent(map);
     }
 
-    /**
-     * 添加事件
-     *
-     * @param adEvent
-     */
-    public void addEvent(AdEvent adEvent) {
-        if (eventSink != null && adEvent != null) {
-            Log.d(TAG, "addEvent adEvent:" + adEvent.toMap());
-            eventSink.success(adEvent.toMap());
+    ///  发送事件
+    public void postEvent(String adId, String msg, String adEvent) {
+        Map<String, String> map = new HashMap<String, String>();
+        map.put(AD_ID, adId);
+        map.put(AD_MSG, msg);
+        map.put(AD_EVENT, adEvent);
+        postEvent(map);
+    }
+
+    /// 发送事件消息给flutter
+    public void postEvent(Map<String, String> map) {
+        if (_eventChannel != null && map != null) {
+            Log.d(TAG, "postEvent map:" + map.toString());
+            _eventChannel.success(map);
         }
     }
 
     @Override
     public void onListen(Object arguments, EventChannel.EventSink events) {
-        eventSink = events;
+        _eventChannel = events;
     }
 
     @Override
     public void onCancel(Object arguments) {
-        eventSink = null;
+        _eventChannel = null;
     }
 
     @Override

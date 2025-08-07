@@ -1,7 +1,8 @@
 
-plugins {
-    id "com.android.library"
-}
+//apply plugin: "com.android.library"
+//plugins {
+//    id "com.android.library"
+//}
 group 'com.sskj.flutter_plugin_ad'
 version '1.0'
 
@@ -15,6 +16,28 @@ def getCurrentProjectDir() {
         }
     }
     return result
+}
+
+buildscript {
+
+    repositories {
+        google()
+        mavenCentral()
+        maven { url 'https://mirrors.tuna.tsinghua.edu.cn/flutter/download.flutter.io' }
+        // GroMore
+        maven { url "https://artifact.bytedance.com/repository/Volcengine/" }
+        maven { url "https://artifact.bytedance.com/repository/pangle" }
+//        荣耀
+        maven { url 'https://developer.hihonor.com/repo' }
+//        adset
+        maven {
+            allowInsecureProtocol = true
+            url "http://maven.shenshiads.com/nexus/repository/adset/"
+        }
+        dependencies {
+            classpath("com.android.tools.build:gradle:8.2.0")
+        }
+    }
 }
 
 rootProject.allprojects {
@@ -43,7 +66,7 @@ rootProject.allprojects {
     }
 }
 
-//apply plugin: 'com.android.library'
+apply plugin: 'com.android.library'
 
 android {
     namespace "com.sskj.flutter_plugin_ad"
@@ -58,8 +81,8 @@ android {
 
     //app目录下加入这个代码
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 }
 

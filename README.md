@@ -1,5 +1,5 @@
 ----------
-# AdSetSDK Flutter对接文档
+# Flutter对接文档
 ----------
 
 
@@ -388,8 +388,3 @@ android项目模块目录下`android/app/build.gradle`中修改`minSdkVersion 21
         // 注意，(安卓如果不设置高度，那么会默认填充整个父Widget)(iOS需传后面的height参数作为高度，如果不传则使用默认高度)
         SizedBox(height: 310, child: NativeAdWidget(adId: adIdNative, height: '310')));
 ```
-
-###  学习天地
-**接入学习天地需要适配AppCompat主题.**
-
-    安卓项目的AndroidManifest.xml中，application 标签加入 android:theme="@style/Theme.AppCompat.Light.NoActionBar"
