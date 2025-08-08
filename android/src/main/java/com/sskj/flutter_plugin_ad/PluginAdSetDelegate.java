@@ -149,7 +149,7 @@ public class PluginAdSetDelegate implements PluginRegistry.ActivityResultListene
     public void onMethodCall(MethodCall call, Result result) {
         String posId = call.argument(POS_ID);
         String adId = call.argument(AD_ID);
-        Log.d(TAG, "flutter调用原生方法：" + call.method + ", posId：" + posId + ", adId：" + adId);
+        Log.d(TAG, "flutter调用原生方法：" + call.method);
         switch (call.method) {
             case "getPlatformVersion":
                 getPlatformVersion(call, result);
@@ -223,18 +223,15 @@ public class PluginAdSetDelegate implements PluginRegistry.ActivityResultListene
             OSETSDK.getInstance().init(activity.getApplication(), appKey, new OSETInitListener() {
                 @Override
                 public void onError(String s) {
-
+                    Log.d(TAG, "初始化失败：" + s);
                 }
 
                 @Override
                 public void onSuccess() {
-
+                    Log.d(TAG, "初始化成功");
                 }
             });
-//            OSETSDK.getInstance().setIsDebug(isDebug);
-
             result.success(true);
-            Log.d(TAG, "初始化完成");
         } catch (Exception e) {
             Log.d(TAG, "初始化失败 error:" + e.getMessage());
             result.error("-100", "初始化失败", e);
@@ -678,7 +675,7 @@ public class PluginAdSetDelegate implements PluginRegistry.ActivityResultListene
     /// 发送事件消息给flutter
     public void postEvent(Map<String, Object> map) {
         if (_eventChannel != null && map != null) {
-            Log.d(TAG, "postEvent map:" + map.toString());
+            Log.d(TAG, "调用flutter 传参 map:" + map);
             _eventChannel.success(map);
         }
     }

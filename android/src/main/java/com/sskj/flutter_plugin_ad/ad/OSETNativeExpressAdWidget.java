@@ -27,7 +27,6 @@ import io.flutter.plugin.platform.PlatformView;
 public class OSETNativeExpressAdWidget implements PlatformView {
     private static final String TAG = "adset_plugin";
     private FrameLayout parent;
-    private FrameLayout adContainer;
     private CstOnGlobalLayoutListener onGlobalLayoutListener;
 
     public OSETNativeExpressAdWidget(@NonNull Context context, String adId, double adWidth) {
@@ -41,30 +40,23 @@ public class OSETNativeExpressAdWidget implements PlatformView {
 
         OSETNativeExpressAd osetNativeExpressAd = OSETNativeAdManager.getInstance().getOSETNativeExpressAdByAdId(adId);
         if (osetNativeExpressAd != null && osetNativeExpressAd.getNativeAd() != null && osetNativeExpressAd.getNativeAd().isUsable()) {
+            Log.d(TAG, "a1");
             View nativeExpressAdView = osetNativeExpressAd.getExpressAdView();
             if (nativeExpressAdView != null) {
-                // 新建广告容器并将广告填入
-                adContainer = new FrameLayout(context);
-                adContainer.setLayoutParams(new ViewGroup.LayoutParams(width, context.getResources().getDisplayMetrics().heightPixels));
-                adContainer.addView(nativeExpressAdView);
-
-                if (adContainer.getChildCount() > 0) {
-                    ViewGroup.LayoutParams layoutParams = adContainer.getChildAt(0).getLayoutParams();
-                    if (layoutParams instanceof FrameLayout.LayoutParams) {
-                        ((FrameLayout.LayoutParams) layoutParams).gravity = Gravity.TOP;
-                    }
-                }
+                Log.d(TAG, "a2");
                 // 将广告容器放到FlutterView中
-                this.parent.addView(adContainer);
+                this.parent.addView(nativeExpressAdView);
 
                 // 监听广告布局变化，通知Flutter端改变parent的大小（Flutter端默认是无限高度，所以需要计算广告高度之后让Flutter端设置确切的高度）
                 ViewTreeObserver viewTreeObserver = nativeExpressAdView.getViewTreeObserver();
                 if (viewTreeObserver != null) {
+                    Log.d(TAG, "a3");
                     onGlobalLayoutListener = new CstOnGlobalLayoutListener(adId, nativeExpressAdView);
                     viewTreeObserver.addOnGlobalLayoutListener(onGlobalLayoutListener);
                 }
             }
         }
+        Log.d(TAG, "a4");
     }
 
 
@@ -86,9 +78,8 @@ public class OSETNativeExpressAdWidget implements PlatformView {
                 this.onGlobalLayoutListener = null;
             }
 
-            this.parent.removeAllViews();
-            if (this.adContainer != null) {
-                this.adContainer.removeAllViews();
+            if (this.parent != null) {
+                this.parent.removeAllViews();
             }
         } catch (Throwable e) {
             e.printStackTrace();
@@ -108,19 +99,21 @@ public class OSETNativeExpressAdWidget implements PlatformView {
 
         @Override
         public void onGlobalLayout() {
+            Log.d(TAG, "a5");
             if (nativeExpressAdView == null) return;
             int width = nativeExpressAdView.getMeasuredWidth();
             int height = nativeExpressAdView.getMeasuredHeight();
 
+            Log.d(TAG, "a6 广告测量高度：" + width + ", " + height);
             if (width > 0 && height > 0) {
                 if (width > preWidth || height > preHeight) {
                     float density = nativeExpressAdView.getResources().getDisplayMetrics().density;
-                    if (height / density < 48) return;
+//                    if (height / density < 48) return;
 //                    int expectedHeight = (int) (width * (9.0 / 16.0));
 //                    if (height > expectedHeight) {
 //                        height = expectedHeight;
 //                    }
-//                    Log.d(TAG, "onGlobalLayout: " + width + ", " + height + ", " + expectedHeight);
+                    Log.d(TAG, "a7: " + width + ", " + height);
 
                     Map<String, Object> extras = new HashMap<>();
                     extras.put("adId", adId);

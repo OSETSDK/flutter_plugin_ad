@@ -26,7 +26,6 @@ import io.flutter.plugin.platform.PlatformView;
 public class OSETBannerExpressAdWidget implements PlatformView {
     private static final String TAG = "adset_plugin";
     private FrameLayout parent;
-    private FrameLayout adContainer;
     private CstOnGlobalLayoutListener onGlobalLayoutListener;
 
     public OSETBannerExpressAdWidget(@NonNull Context context, String adId, double adWidth) {
@@ -43,19 +42,7 @@ public class OSETBannerExpressAdWidget implements PlatformView {
             View bannerAdView = osetBannerExpressAd.getBannerAdView();
             if (bannerAdView != null) {
                 // 新建广告容器并将广告填入
-//                adContainer = new FrameLayout(context);
-//                adContainer.setLayoutParams(new ViewGroup.LayoutParams(width, context.getResources().getDisplayMetrics().heightPixels));
-//                adContainer.addView(bannerAdView);
                 this.parent.addView(bannerAdView);
-
-//                if (adContainer.getChildCount() > 0) {
-//                    ViewGroup.LayoutParams layoutParams = adContainer.getChildAt(0).getLayoutParams();
-//                    if (layoutParams instanceof FrameLayout.LayoutParams) {
-//                        ((FrameLayout.LayoutParams) layoutParams).gravity = Gravity.TOP;
-//                    }
-//                }
-                // 将广告容器放到FlutterView中
-//                this.parent.addView(adContainer);
 
                 // 监听广告布局变化，通知Flutter端改变parent的大小（Flutter端默认是无限高度，所以需要计算广告高度之后让Flutter端设置确切的高度）
                 ViewTreeObserver viewTreeObserver = bannerAdView.getViewTreeObserver();
@@ -85,9 +72,8 @@ public class OSETBannerExpressAdWidget implements PlatformView {
                 this.onGlobalLayoutListener = null;
             }
 
-            this.parent.removeAllViews();
-            if (this.adContainer != null) {
-                this.adContainer.removeAllViews();
+            if (this.parent != null) {
+                this.parent.removeAllViews();
             }
         } catch (Throwable e) {
             e.printStackTrace();
@@ -119,7 +105,7 @@ public class OSETBannerExpressAdWidget implements PlatformView {
 //                    if (height > expectedHeight) {
 //                        height = expectedHeight;
 //                    }
-                    Log.d(TAG, "onGlobalLayout: " + width + ", " + height + ", " + height);
+                    Log.d(TAG, "onGlobalLayout: " + width + ", " + height);
 
                     Map<String, Object> extras = new HashMap<>();
                     extras.put("adId", adId);

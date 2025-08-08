@@ -13,7 +13,9 @@ class OSETNativeAd extends OSETAd {
   OSETNativeAd(
       {required super.adId,
       required this.posId,
-      required this.adWidth,});
+      required this.adWidth,
+      required this.adHeight,
+      });
 
   @override
   release() {

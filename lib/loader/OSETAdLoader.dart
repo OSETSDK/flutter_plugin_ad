@@ -10,6 +10,7 @@ abstract class OSETAdLoader<T extends OSETAd> {
   OnOSETAdEvent<T>? onAdLoad;
   OnOSETAdFailed<String>? onAdFailed;
   OnOSETAdEvent<T>? onAdExpose;
+  OnOSETAdEvent<T>? onAdRenderSuccess;
   OnOSETAdEvent<T>? onAdClick;
   OnOSETAdEvent<T>? onAdClose;
   OnOSETAdEvent<T>? onAdReward;
@@ -46,6 +47,11 @@ abstract class OSETAdLoader<T extends OSETAd> {
   /// 广告曝光回调
   onAdExposeCallback(T osetAd) {
     onAdExpose?.call(osetAd);
+  }
+
+  /// 广告渲染成功回调
+  onAdRenderSuccessCallBack(T osetAd) {
+    onAdRenderSuccess?.call(osetAd);
   }
 
   /// 广告被点击回调

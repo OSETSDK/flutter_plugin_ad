@@ -13,6 +13,7 @@ class OSETBannerAdLoader extends OSETAdLoader<OSETBannerAd> {
     load(posId: posId, methodName: OSETAdSDK.methodLoadBannerAd, arguments: {
       OSETAdSDK.keyPosId: posId,
       OSETAdSDK.keyAdWidth: adWidth,
+      OSETAdSDK.keyAdHeight: adHeight,
     });
   }
 

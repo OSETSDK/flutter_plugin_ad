@@ -19,7 +19,6 @@ class _NativeState extends State<NativeAdPage> {
   final OSETNativeAdLoader _nativeAdLoader = OSETNativeAdLoader();
   OSETNativeWidget? _nativeAd;
   bool _loading = false;
-  bool _visible = true;
 
   @override
   Widget build(BuildContext context) {
@@ -30,9 +29,11 @@ class _NativeState extends State<NativeAdPage> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(
-              vertical: 40.0,
-              horizontal: 24.0,
+            padding: const EdgeInsets.only(
+              top: 40.0,
+              left: 24.0,
+              right: 24.0,
+              bottom: 24.0,
             ),
             child: SizedBox(
               width: double.infinity,
@@ -46,14 +47,9 @@ class _NativeState extends State<NativeAdPage> {
           ),
 
           /// 信息流模板广告
-          Visibility(
-            visible: _visible,
-            child: Container(
-              width: double.infinity,
-              height: 350,
-              margin: const EdgeInsets.only(top: 24),
-              child: _nativeAd,
-            ),
+         SizedBox(
+            width: double.infinity,
+            child: _nativeAd,
           ),
         ],
       ),
@@ -74,6 +70,7 @@ class _NativeState extends State<NativeAdPage> {
           : Common.iosPosIdNative,
       // 广告宽度
       adWidth: MediaQuery.of(context).size.width,
+      adHeight: 250,
     );
   }
 
@@ -83,17 +80,25 @@ class _NativeState extends State<NativeAdPage> {
 
     // 设置广告加载成功监听
     _nativeAdLoader.onAdLoad = (osetAd) {
+      _loading = false;
+      print('$TAG 信息流广告加载成功...');
       setState(() {
         _nativeAd = osetAd.nativeWidget;
       });
-      _loading = false;
-      print('$TAG 信息流广告加载成功...');
     };
 
     // 设置广告加载失败监听
     _nativeAdLoader.onAdFailed = (msg) {
       _loading = false;
       print('$TAG 信息流广告加载失败, $msg');
+    };
+
+    // 设置广告展示监听
+    _nativeAdLoader.onAdRenderSuccess = (osetAd) {
+      print('$TAG 信息流广告渲染成功...');
+      setState(() {
+        _nativeAd = osetAd.nativeWidget;
+      });
     };
 
     // 设置广告展示监听

@@ -29,7 +29,7 @@ class _BannerAdWidgetState<T extends OSETBannerWidget> extends State<T> {
         ? SizedBox(width: widget.osetBannerAd.adWidth, height: 0)
         : Container(
       width: widget.osetBannerAd.adWidth,
-      height: 50,
+      height: widget.osetBannerAd.adHeight,
       constraints: BoxConstraints(maxWidth: widget.osetBannerAd.adWidth),
       child: Platform.isAndroid
           ? AndroidView(

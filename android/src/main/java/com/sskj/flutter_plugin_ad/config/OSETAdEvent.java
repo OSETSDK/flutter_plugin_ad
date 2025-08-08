@@ -10,6 +10,8 @@ public class OSETAdEvent {
     public static final String onAdError = "onAdError";
     // 广告展示
     public static final String onAdExposure = "onAdExposure";
+    // 信息流广告渲染成功
+    public static final String onAdRenderSuccess = "onAdRenderSuccess";
     // 广告关闭
     public static final String onAdClosed = "onAdClosed";
     // 广告点击

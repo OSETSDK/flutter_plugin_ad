@@ -35,6 +35,9 @@
         <activity android:name="com.kc.openset.video.VideoContentActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
 
+        <activity android:name="com.kc.openset.activity.OSETWebViewActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+
         <activity
             android:name="com.sskj.flutter_plugin_ad.VideoHomeActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"

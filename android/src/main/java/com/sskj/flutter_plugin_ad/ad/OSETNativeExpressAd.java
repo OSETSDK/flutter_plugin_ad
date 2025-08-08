@@ -16,6 +16,7 @@ import com.sskj.flutter_plugin_ad.PluginAdSetDelegate;
  * @date 2025/8/7
  */
 public class OSETNativeExpressAd implements OSETNativeListener {
+    private static final String TAG = "adset_plugin";
     private final String posId;
     private final String adId;
     private final Activity activity;
@@ -32,6 +33,7 @@ public class OSETNativeExpressAd implements OSETNativeListener {
         OSETNative.getInstance().setContext(activity).setPosId(posId).loadAd(new OSETNativeAdLoadListener() {
             @Override
             public void onLoadSuccess(OSETNativeAd osetNativeAd) {
+                Log.d(TAG, "信息流加载成功: ");
                 OSETNativeExpressAd.this.osetNativeAd = osetNativeAd;
                 postEvent(adId, "", OSETAdEvent.onAdLoaded);
                 osetNativeAd.render(activity, OSETNativeExpressAd.this);
@@ -39,6 +41,7 @@ public class OSETNativeExpressAd implements OSETNativeListener {
 
             @Override
             public void onLoadFail(String s, String s1) {
+                Log.e(TAG, "信息流加载失败: ");
                 postEvent(adId, "广告加载失败：" + s + ", s1：" + s1, OSETAdEvent.onAdError);
                 release();
             }
@@ -59,16 +62,20 @@ public class OSETNativeExpressAd implements OSETNativeListener {
 
     @Override
     public void onRenderSuccess(View view) {
+        Log.d(TAG, "信息流渲染成功: ");
         this.expressAdView = view;
+        postEvent(adId, "", OSETAdEvent.onAdRenderSuccess);
     }
 
     @Override
     public void onShow(View view) {
+        Log.d(TAG, "信息流曝光: ");
         postEvent(adId, "", OSETAdEvent.onAdExposure);
     }
 
     @Override
     public void onError(String s, String s1) {
+        Log.d(TAG, "信息流渲染失败: ");
         postEvent(adId, "广告渲染失败：" + s + ", s1：" + s1, OSETAdEvent.onAdError);
     }
 

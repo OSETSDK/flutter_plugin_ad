@@ -7,6 +7,7 @@ import 'package:flutter_openset_ads/widget/native/OSETNativeAd.dart';
 class OSETAdManager {
   static const _eventOnAdLoaded = 'onAdLoaded';
   static const _eventOnAdLoadFail = 'onAdError';
+  static const _eventOnRenderSuccess = 'onAdRenderSuccess';
   static const _eventOnAdExpose = 'onAdExposure';
   static const _eventOnAdClick = 'onAdClicked';
   static const _eventOnAdClose = 'onAdClosed';
@@ -73,12 +74,16 @@ class OSETAdManager {
     var osetAd = osetAdLoader.findOSETAd(adId: adId);
     if (osetAd == null) return;
 
+    print("adset_plugin 原生调用flutter方法：$adEvent");
     switch (adEvent) {
       case _eventOnAdLoaded:
         osetAdLoader.onAdLoadCallback(osetAd);
         break;
       case _eventOnAdLoadFail:
         osetAdLoader.onAdFailedCallback(arguments[OSETAdSDK.keyAdMsg]);
+        break;
+      case _eventOnRenderSuccess:
+        osetAdLoader.onAdRenderSuccessCallBack(osetAd);
         break;
       case _eventOnAdExpose:
         osetAdLoader.onAdExposeCallback(osetAd);
@@ -96,10 +101,9 @@ class OSETAdManager {
         osetAdLoader.onAdTimeOverCallback(osetAd);
         break;
       case _eventOnAdMeasured:
-        if (osetAdLoader is OSETNativeAdLoader &&
-            osetAd is OSETNativeAd) {
-          double adWidth = arguments[OSETAdSDK.keyAdWidth] ?? 0;
-          double adHeight = arguments[OSETAdSDK.keyAdHeight] ?? 0;
+        double adWidth = arguments[OSETAdSDK.keyAdWidth] ?? 0;
+        double adHeight = arguments[OSETAdSDK.keyAdHeight] ?? 0;
+        if (osetAdLoader is OSETNativeAdLoader && osetAd is OSETNativeAd) {
           osetAdLoader.onAdMeasured(osetAd, adWidth, adHeight);
         }
         break;

@@ -27,9 +27,11 @@ class _BannerAdState extends State<BannerAdPage> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(
-              vertical: 40.0,
-              horizontal: 24.0,
+            padding: const EdgeInsets.only(
+              top: 40.0,
+              left: 24.0,
+              right: 24.0,
+              bottom: 24.0,
             ),
             child: SizedBox(
               width: double.infinity,
@@ -43,13 +45,9 @@ class _BannerAdState extends State<BannerAdPage> {
           ),
 
           /// banner广告容器
-          Visibility(
-            child: Container(
-              width: double.infinity,
-              height: 50,
-              margin: const EdgeInsets.only(top: 24),
-              child: _bannerAd,
-            ),
+          SizedBox(
+            width: double.infinity,
+            child: _bannerAd,
           ),
         ],
       ),
@@ -110,7 +108,7 @@ class _BannerAdState extends State<BannerAdPage> {
               : Common.iosPosIdBanner,
       // 广告宽度
       adWidth: MediaQuery.of(context).size.width,
-      adHeight: 50,
+      adHeight: 50
     );
   }
 }
