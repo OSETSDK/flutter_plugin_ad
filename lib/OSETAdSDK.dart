@@ -19,6 +19,7 @@ class OSETAdSDK {
   static const keyAdMsg = 'adMsg';
   static const keyRewardCount = 'rewardCount';
   static const keyRewardDownTime = 'rewardDownTime';
+  static const keyToastMsg = 'toastMsg';
 
   static const methodGetPlatformVersion = 'getPlatformVersion';
   static const methodCheckAndReqPermission = 'checkAndReqPermission';
@@ -36,6 +37,7 @@ class OSETAdSDK {
 
   static const methodReleaseAd = 'releaseAd';
   static const methodOnAdEvent = 'onAdEvent';
+  static const methodOnToast = "onToast";
 
   static const viewTypeOSETNativeAd = 'flutter_plugin_ad_native';
   static const viewTypeOSETBannerAd = 'flutter_plugin_ad_banner';
@@ -47,6 +49,11 @@ class OSETAdSDK {
   }
 
   static bool _initialized = false;
+
+  /// 提供SDK初始化状态方法
+  static bool initialized() {
+    return _initialized;
+  }
 
   /// 初始化广告SDK
   /// [appKey] 广告配置 appKey

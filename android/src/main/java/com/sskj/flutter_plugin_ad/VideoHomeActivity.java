@@ -15,7 +15,7 @@ import com.kc.openset.video.OSETVideoContentListener;
 import com.kc.openset.video.VideoContentResult;
 import com.sskj.flutter_plugin_ad.callback.ClickItem;
 
-public class KsAdActivity extends FragmentActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
+public class VideoHomeActivity extends FragmentActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
 
     private static final String TAG = "ADSET";
 

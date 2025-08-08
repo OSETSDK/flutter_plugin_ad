@@ -25,6 +25,14 @@ class OSETAdManager {
     required String methodName,
     Map<String, dynamic>? arguments,
   }) async {
+    if (!OSETAdSDK.initialized()) {
+      // 未初始化SDK，请先初始化广告SDK
+      invokeMethod(
+          method: OSETAdSDK.methodOnToast,
+          params: {OSETAdSDK.keyToastMsg: '请先初始化广告SDK'});
+      return;
+    }
+
     var contains = _adLoaderList.contains(osetLoader);
     if (!contains) {
       _adLoaderList.add(osetLoader);

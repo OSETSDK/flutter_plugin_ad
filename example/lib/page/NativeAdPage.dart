@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_openset_ads/loader/OSETNativeAdLoader.dart';
 import 'package:flutter_openset_ads/widget/native/OSETNativeWidget.dart';
 
+import '../main.dart';
+
 class NativeAdPage extends StatefulWidget {
   const NativeAdPage({super.key});
 
@@ -48,6 +50,7 @@ class _NativeState extends State<NativeAdPage> {
             visible: _visible,
             child: Container(
               width: double.infinity,
+              height: 350,
               margin: const EdgeInsets.only(top: 24),
               child: _nativeAd,
             ),
@@ -55,48 +58,6 @@ class _NativeState extends State<NativeAdPage> {
         ],
       ),
     );
-  }
-
-  @override
-  void initState() {
-    super.initState();
-
-    // 设置广告加载成功监听
-    _nativeAdLoader.onAdLoad = (osetAd) {
-      setState(() {
-        _nativeAd = osetAd.nativeAdWidget;
-      });
-      _loading = false;
-      print('信息流广告加载成功...');
-    };
-
-    // 设置广告加载失败监听
-    _nativeAdLoader.onAdFailed = (msg) {
-      _loading = false;
-      print('信息流广告加载失败, $msg');
-    };
-
-    // 设置广告展示监听
-    _nativeAdLoader.onAdExpose = (osetAd) {
-      print('信息流广告展示成功...');
-    };
-
-    // 设置广告被点击监听
-    _nativeAdLoader.onAdClick = (osetAd) {
-      print('信息流广告被点击...');
-    };
-
-    // 设置广告关闭监听
-    _nativeAdLoader.onAdClose = (osetAd) {
-      print('信息流广告被关闭...');
-    };
-  }
-
-  @override
-  void dispose() {
-    /// 释放广告
-    _nativeAdLoader.release();
-    super.dispose();
   }
 
   /// 加载信息流广告
@@ -108,11 +69,53 @@ class _NativeState extends State<NativeAdPage> {
     _nativeAdLoader.loadAd(
       // 广告位ID，不同端的广告位ID可能不一致，需替换成自己相应端的广告位ID
       posId:
-          Platform.isAndroid
-              ? Common.androidPosIdNative
-              : Common.iosPosIdNative,
+      Platform.isAndroid
+          ? Common.androidPosIdNative
+          : Common.iosPosIdNative,
       // 广告宽度
       adWidth: MediaQuery.of(context).size.width,
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    // 设置广告加载成功监听
+    _nativeAdLoader.onAdLoad = (osetAd) {
+      setState(() {
+        _nativeAd = osetAd.nativeWidget;
+      });
+      _loading = false;
+      print('$TAG 信息流广告加载成功...');
+    };
+
+    // 设置广告加载失败监听
+    _nativeAdLoader.onAdFailed = (msg) {
+      _loading = false;
+      print('$TAG 信息流广告加载失败, $msg');
+    };
+
+    // 设置广告展示监听
+    _nativeAdLoader.onAdExpose = (osetAd) {
+      print('$TAG 信息流广告展示成功...');
+    };
+
+    // 设置广告被点击监听
+    _nativeAdLoader.onAdClick = (osetAd) {
+      print('$TAG 信息流广告被点击...');
+    };
+
+    // 设置广告关闭监听
+    _nativeAdLoader.onAdClose = (osetAd) {
+      print('$TAG 信息流广告被关闭...');
+    };
+  }
+
+  @override
+  void dispose() {
+    /// 释放广告
+    _nativeAdLoader.release();
+    super.dispose();
   }
 }

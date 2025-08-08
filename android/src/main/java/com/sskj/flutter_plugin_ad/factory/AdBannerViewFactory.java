@@ -1,4 +1,4 @@
-package com.sskj.flutter_plugin_ad;
+package com.sskj.flutter_plugin_ad.factory;
 
 import android.content.Context;
 import android.text.TextUtils;
@@ -7,7 +7,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.sskj.flutter_plugin_ad.ad.OSETNativeExpressAdWidget;
+import com.sskj.flutter_plugin_ad.ad.OSETBannerExpressAdWidget;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,14 +17,14 @@ import io.flutter.plugin.platform.PlatformView;
 import io.flutter.plugin.platform.PlatformViewFactory;
 
 /**
- * 原生 View 工厂
+ * Banner View 工厂
  */
 @SuppressWarnings("unchecked")
-public class AdNativeViewFactory extends PlatformViewFactory {
+public class AdBannerViewFactory extends PlatformViewFactory {
     private static final String TAG = "adset_plugin";
-    private final Map<String, OSETNativeExpressAdWidget> adMap = new HashMap<>();
+    private final Map<String, OSETBannerExpressAdWidget> adMap = new HashMap<>();
 
-    public AdNativeViewFactory() {
+    public AdBannerViewFactory() {
         super(StandardMessageCodec.INSTANCE);
     }
 
@@ -45,18 +45,18 @@ public class AdNativeViewFactory extends PlatformViewFactory {
         if (TextUtils.isEmpty(adId)) {
             return null;
         }
-        OSETNativeExpressAdWidget platformView = adMap.get(adId);
+        OSETBannerExpressAdWidget platformView = adMap.get(adId);
         if (platformView != null) {
             return platformView;
         }
 
-        OSETNativeExpressAdWidget adWidget = new OSETNativeExpressAdWidget(context, adId, adWidth);
+        OSETBannerExpressAdWidget adWidget = new OSETBannerExpressAdWidget(context, adId, adWidth);
         adMap.put(adId, adWidget);
         return adWidget;
     }
 
     public void release(String adId) {
-        OSETNativeExpressAdWidget platformView = adMap.get(adId);
+        OSETBannerExpressAdWidget platformView = adMap.get(adId);
 
         if (platformView != null) {
             platformView.release();

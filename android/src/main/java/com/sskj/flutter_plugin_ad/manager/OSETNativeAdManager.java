@@ -1,12 +1,12 @@
-package com.sskj.flutter_plugin_ad;
+package com.sskj.flutter_plugin_ad.manager;
 
 import android.app.Activity;
 import android.util.Log;
 
-import androidx.annotation.Nullable;
-
+import com.sskj.flutter_plugin_ad.PluginAdSetDelegate;
 import com.sskj.flutter_plugin_ad.ad.OSETNativeExpressAd;
 import com.sskj.flutter_plugin_ad.config.OSETAdEvent;
+import com.sskj.flutter_plugin_ad.factory.AdNativeViewFactory;
 import com.sskj.flutter_plugin_ad.listener.OnAdReleaseListener;
 
 import java.util.HashMap;
@@ -54,7 +54,7 @@ public class OSETNativeAdManager implements OnAdReleaseListener {
         osetNativeExpressAd.loadAd();
     }
 
-    public OSETNativeExpressAd getBwtNativeExpressAdByAdId(String adId) {
+    public OSETNativeExpressAd getOSETNativeExpressAdByAdId(String adId) {
         return adId == null ? null : nativeExpressAdMap.get(adId);
     }
 

@@ -4,37 +4,37 @@ import android.app.Activity;
 import android.util.Log;
 import android.view.View;
 
-import com.kc.openset.ad._native.OSETNative;
-import com.kc.openset.ad._native.OSETNativeAd;
-import com.kc.openset.ad.listener.OSETNativeAdLoadListener;
-import com.kc.openset.ad.listener.OSETNativeListener;
-import com.sskj.flutter_plugin_ad.config.OSETAdEvent;
+import com.kc.openset.ad.banner.OSETBanner;
+import com.kc.openset.ad.banner.OSETBannerAd;
+import com.kc.openset.ad.listener.OSETBannerAdLoadListener;
+import com.kc.openset.ad.listener.OSETBannerListener;
 import com.sskj.flutter_plugin_ad.PluginAdSetDelegate;
+import com.sskj.flutter_plugin_ad.config.OSETAdEvent;
 
 /**
  * @author Nnnn
- * @date 2025/8/7
+ * @date 2025/8/8
  */
-public class OSETNativeExpressAd implements OSETNativeListener {
+public class OSETBannerExpressAd implements OSETBannerListener {
     private final String posId;
     private final String adId;
     private final Activity activity;
-    private OSETNativeAd osetNativeAd;
+    private OSETBannerAd osetBannerAd;
     private View expressAdView;
 
-    public OSETNativeExpressAd(String posId, String adId, Activity activity) {
+    public OSETBannerExpressAd(String posId, String adId, Activity activity) {
         this.posId = posId;
         this.adId = adId;
         this.activity = activity;
     }
 
     public void loadAd() {
-        OSETNative.getInstance().setContext(activity).setPosId(posId).loadAd(new OSETNativeAdLoadListener() {
+        OSETBanner.getInstance().setContext(activity).setPosId(posId).loadAd(new OSETBannerAdLoadListener() {
             @Override
-            public void onLoadSuccess(OSETNativeAd osetNativeAd) {
-                OSETNativeExpressAd.this.osetNativeAd = osetNativeAd;
+            public void onLoadSuccess(OSETBannerAd osetBannerAd) {
+                OSETBannerExpressAd.this.osetBannerAd = osetBannerAd;
                 postEvent(adId, "", OSETAdEvent.onAdLoaded);
-                osetNativeAd.render(activity, OSETNativeExpressAd.this);
+                osetBannerAd.render(activity, OSETBannerExpressAd.this);
             }
 
             @Override
@@ -53,7 +53,6 @@ public class OSETNativeExpressAd implements OSETNativeListener {
     @Override
     public void onClose(View view) {
         postEvent(adId, "", OSETAdEvent.onAdClosed);
-        PluginAdSetDelegate.getInstance().loopNotifyOnAdRelease(adId);
         release();
     }
 
@@ -83,11 +82,11 @@ public class OSETNativeExpressAd implements OSETNativeListener {
         return adId;
     }
 
-    public OSETNativeAd getNativeAd() {
-        return osetNativeAd;
+    public OSETBannerAd getBannerAd() {
+        return osetBannerAd;
     }
 
-    public View getExpressAdView() {
+    public View getBannerAdView() {
         return expressAdView;
     }
 
@@ -96,9 +95,9 @@ public class OSETNativeExpressAd implements OSETNativeListener {
      */
     public void release() {
         try {
-            if (osetNativeAd != null) {
-                osetNativeAd.destroy();
-                osetNativeAd = null;
+            if (osetBannerAd != null) {
+                osetBannerAd.destroy();
+                osetBannerAd = null;
             }
             Log.d("adset_plugin", "广告被释放, adId: " + adId);
         } catch (Exception e) {

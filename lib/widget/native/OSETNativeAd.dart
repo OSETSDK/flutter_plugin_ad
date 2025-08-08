@@ -4,7 +4,7 @@ import 'package:flutter_openset_ads/widget/native/OSETNativeWidget.dart';
 
 class OSETNativeAd extends OSETAd {
   GlobalKey<OSETNativeAdState>? globalKey;
-  OSETNativeWidget? nativeAdWidget;
+  OSETNativeWidget? nativeWidget;
   final String posId;
   final double adWidth;
   double adHeight = 0;

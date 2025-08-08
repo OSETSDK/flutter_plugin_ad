@@ -1,16 +1,18 @@
 import 'dart:io';
 
-import 'package:example/page/InterstitialAdPage.dart';
-import 'package:example/page/NativeAdPage.dart';
-import 'package:example/page/RewardVideoAdPage.dart';
-import 'package:example/page/SplashAdLauncherPage.dart';
+import 'package:example/page/BannerAdPage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_openset_ads/OSETAdSDK.dart';
-import 'package:example/widget/common_button.dart';
 
 import '../common/Common.dart';
+import '../widget/common_button.dart';
+import 'SplashAdLauncherPage.dart';
+import 'InterstitialAdPage.dart';
 import 'FullVideoAdPage.dart';
+import 'RewardVideoAdPage.dart';
+import 'NativeAdPage.dart';
+import 'VideoContentPage.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -70,13 +72,13 @@ class _MainState extends State<MainPage> {
                     _push(context, const RewardVideoAdPage());
                   }),
                   buildCommonButton('Banner广告', callback: () {
+                    _push(context, const BannerAdPage());
                   }),
                   buildCommonButton('原生信息流广告', callback: () {
                     _push(context, const NativeAdPage());
                   }),
                   buildCommonButton('短视频内容', callback: () {
-                  }),
-                  buildCommonButton('短视频内容首页', callback: () {
+                    _push(context, const VideoContentPage());
                   }),
                 ],
               )),

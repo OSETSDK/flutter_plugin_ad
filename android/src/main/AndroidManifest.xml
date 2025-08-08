@@ -32,9 +32,11 @@
         <!--            android:configChanges="keyboardHidden|orientation|screenSize"-->
         <!--            tools:replace="android:configChanges"/>-->
 
+        <activity android:name="com.kc.openset.video.VideoContentActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
 
         <activity
-            android:name=".KsAdActivity"
+            android:name="com.sskj.flutter_plugin_ad.VideoHomeActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:launchMode='standard'
             android:screenOrientation="portrait"

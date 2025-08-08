@@ -29,10 +29,9 @@ class OSETNativeAdLoader extends OSETAdLoader<OSETNativeAd> {
   @override
   onAdLoadCallback(OSETNativeAd osetAd) {
     osetAd.globalKey = GlobalKey();
-    osetAd.nativeAdWidget = OSETNativeWidget(
+    osetAd.nativeWidget = OSETNativeWidget(
         key: osetAd.globalKey,
-        osetNativeAd: osetAd,
-        viewType: OSETAdSDK.viewTypeOSETNativeAd);
+        osetNativeAd: osetAd);
     return super.onAdLoadCallback(osetAd);
   }
 

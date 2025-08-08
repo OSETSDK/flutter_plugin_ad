@@ -7,34 +7,31 @@ class OSETBannerAdLoader extends OSETAdLoader<OSETBannerAd> {
   /// 加载banner广告
   loadAd({
     required String posId,
-    required int adWidth,
-    required int adHeight,
+    required double adWidth,
+    required double adHeight,
   }) {
-    if (adWidth <= 0 || adHeight <= 0) {
-      print("广告宽度和高度必须大于0!");
-      throw ArgumentError("广告宽度和高度必须大于0");
-    }
-
     load(posId: posId, methodName: OSETAdSDK.methodLoadBannerAd, arguments: {
+      OSETAdSDK.keyPosId: posId,
       OSETAdSDK.keyAdWidth: adWidth,
-      OSETAdSDK.keyAdHeight: adHeight,
     });
-  }
-
-  @override
-  onAdLoadCallback(OSETBannerAd osetAd) {
-    osetAd.bannerWidget = OSETBannerWidget(
-        osetBannerAd: osetAd, viewType: OSETAdSDK.viewTypeOSETBannerAd);
-    return super.onAdLoadCallback(osetAd);
   }
 
   @override
   OSETBannerAd createOSETAd(
       {required String adId, required Map<String, dynamic>? arguments}) {
     return OSETBannerAd(
-        adId: adId,
-        posId: arguments?[OSETAdSDK.keyPosId],
-        adWidth: arguments?[OSETAdSDK.keyAdWidth],
-        adHeight: arguments?[OSETAdSDK.keyAdHeight]);
+      adId: adId,
+      posId: arguments?[OSETAdSDK.keyPosId],
+      adWidth: arguments?[OSETAdSDK.keyAdWidth] ?? double.infinity,
+      adHeight: arguments?[OSETAdSDK.keyAdHeight] ?? double.infinity,
+    );
+  }
+
+  @override
+  onAdLoadCallback(OSETBannerAd osetAd) {
+    osetAd.bannerWidget = OSETBannerWidget(
+      osetBannerAd: osetAd,
+    );
+    return super.onAdLoadCallback(osetAd);
   }
 }

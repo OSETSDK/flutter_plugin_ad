@@ -5,6 +5,7 @@ class OSETBannerAd extends OSETAd {
   final String posId;
   final double adWidth;
   final double adHeight;
+  bool adClosed = false;
 
   OSETBannerWidget? bannerWidget;
 

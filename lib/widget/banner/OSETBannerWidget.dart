@@ -11,26 +11,25 @@ class OSETBannerWidget extends StatefulWidget {
   final String viewType;
 
   const OSETBannerWidget(
-      {super.key, required this.osetBannerAd, required this.viewType});
+      {super.key, required this.osetBannerAd, this.viewType = OSETAdSDK.viewTypeOSETBannerAd});
 
   @override
-  _BannerAdWidgetState createState() => _BannerAdWidgetState();
+  _BannerAdWidgetState createState() => OSETBannerAdState();
 }
 
-class _BannerAdWidgetState extends State<OSETBannerWidget> {
-  final String viewType = 'flutter_plugin_ad_banner';
-
+class _BannerAdWidgetState<T extends OSETBannerWidget> extends State<T> {
   @override
   Widget build(BuildContext context) {
     Map<String, dynamic> creationParams = <String, dynamic>{
       OSETAdSDK.keyPosId: widget.osetBannerAd.posId,
       OSETAdSDK.keyAdId: widget.osetBannerAd.adId,
       OSETAdSDK.keyAdWidth: widget.osetBannerAd.adWidth,
-      OSETAdSDK.keyAdHeight: widget.osetBannerAd.adHeight,
     };
-    return Container(
+    return widget.osetBannerAd.adClosed
+        ? SizedBox(width: widget.osetBannerAd.adWidth, height: 0)
+        : Container(
       width: widget.osetBannerAd.adWidth,
-      height: widget.osetBannerAd.adHeight,
+      height: 50,
       constraints: BoxConstraints(maxWidth: widget.osetBannerAd.adWidth),
       child: Platform.isAndroid
           ? AndroidView(
@@ -45,4 +44,10 @@ class _BannerAdWidgetState extends State<OSETBannerWidget> {
             ),
     );
   }
+
+  void update() {
+    setState(() {});
+  }
 }
+
+class OSETBannerAdState extends _BannerAdWidgetState<OSETBannerWidget> {}

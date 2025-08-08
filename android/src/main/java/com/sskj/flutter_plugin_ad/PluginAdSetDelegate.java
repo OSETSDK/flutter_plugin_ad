@@ -10,6 +10,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
@@ -37,7 +38,11 @@ import com.kc.openset.video.OSETVideoContent;
 import com.kc.openset.video.OSETVideoContentTaskListener;
 import com.sskj.flutter_plugin_ad.callback.ClickItem;
 import com.sskj.flutter_plugin_ad.config.OSETAdEvent;
+import com.sskj.flutter_plugin_ad.factory.AdBannerViewFactory;
+import com.sskj.flutter_plugin_ad.factory.AdNativeViewFactory;
 import com.sskj.flutter_plugin_ad.listener.OnAdReleaseListener;
+import com.sskj.flutter_plugin_ad.manager.OSETBannerAdManager;
+import com.sskj.flutter_plugin_ad.manager.OSETNativeAdManager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -126,13 +131,13 @@ public class PluginAdSetDelegate implements PluginRegistry.ActivityResultListene
 
     public void registerViewFactory() {
         try {
-            bannerAdFactory = new AdBannerViewFactory("flutter_plugin_ad_banner", this);
+            bannerAdFactory = new AdBannerViewFactory();
             this.bind.getPlatformViewRegistry()
                     .registerViewFactory("flutter_plugin_ad_banner", bannerAdFactory);
             nativeAdFactory = new AdNativeViewFactory();
             this.bind.getPlatformViewRegistry()
                     .registerViewFactory("flutter_plugin_ad_native", nativeAdFactory);
-            Log.d(TAG, "注册原生信息流、banner工厂: ");
+            Log.d(TAG, "注册banner、原生信息流工厂: ");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -171,7 +176,7 @@ public class PluginAdSetDelegate implements PluginRegistry.ActivityResultListene
                 showRewardVideo(call, result);
                 break;
             case "loadBannerAd":
-
+                OSETBannerAdManager.getInstance().loadBannerAd(activity, posId, adId);
                 break;
             case "loadNativeAd":
                 OSETNativeAdManager.getInstance().loadNativeExpressAd(activity, posId, adId);
@@ -187,11 +192,17 @@ public class PluginAdSetDelegate implements PluginRegistry.ActivityResultListene
                 loopNotifyOnAdRelease(adId);
                 result.success(true);
                 break;
+            case "onToast":
+                // Toast 弹窗
+                String toastMsg = call.argument("toastMsg");
+                Toast.makeText(activity, toastMsg, Toast.LENGTH_SHORT).show();
+                break;
             default:
                 result.notImplemented();
                 break;
         }
     }
+
     /**
      * 初始化
      *
@@ -549,6 +560,7 @@ public class PluginAdSetDelegate implements PluginRegistry.ActivityResultListene
                 android.util.Log.e(TAG, "视频开始播放:" + i);
             }
         });
+        postEvent(adId, OSETAdEvent.onAdLoaded);
         result.success(true);
     }
 
@@ -557,14 +569,16 @@ public class PluginAdSetDelegate implements PluginRegistry.ActivityResultListene
         String adId = call.argument(AD_ID);
         if (TextUtils.isEmpty(posId)) {
             result.error("-300", "参数错误，posId 不能为空", new Exception("参数错误，posId 不能为空"));
+            postEvent(adId, "参数错误，posId 不能为空", OSETAdEvent.onAdError);
             return;
         }
 
-        Intent intent = new Intent(activity, KsAdActivity.class);
+        Intent intent = new Intent(activity, VideoHomeActivity.class);
         intent.putExtra(AD_ID, posId);
         activity.startActivity(intent);
         activity.overridePendingTransition(0, 0);
-        KsAdActivity.onClickItem(new ClickItem() {
+        postEvent(adId, OSETAdEvent.onAdLoaded);
+        VideoHomeActivity.onClickItem(new ClickItem() {
             @Override
             public void selectItem(int index) {
                 Log.e(TAG, "index: " + index);
