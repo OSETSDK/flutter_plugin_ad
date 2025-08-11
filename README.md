@@ -3,202 +3,382 @@
 ----------
 
 
-## 集成插件
+## 一、集成插件
 
-*   配置 `pubspec.yaml` 集成插件
+*   配置 `pubspec.yaml` 快速集成插件
 
 ```
 dependencies:
-  flutter_openset_ads: ^1.0.6
-```
-
-*   或通过下载 `flutter_plugin_ad` 拷贝插件到 `lib/plugins` 目录下(其他位置也都可以)
-
-```
-flutter_plugin_ad:
-  path: lib/plugins/flutter_plugin_ad # 本地引入
+  flutter_openset_ads: ^1.0.7
 ```
 
 
-* 导入
+* 导包
 ```
-在您的 Dart 代码中，您可以使用：
-import 'package:flutter_openset_ads/entity/ad_event.dart';
-import 'package:flutter_openset_ads/flutter_plugin_ad.dart';
-import 'package:flutter_openset_ads/view/banner_ad_widget.dart';
-import 'package:flutter_openset_ads/view/native_ad_widget.dart';
-```
+在您的 Dart 代码中，您可以导入如下包：
 
+/// 插件初始化
+import 'package:flutter_openset_ads/OSETAdSDK.dart';
 
-## Android配置
-## 接入前注意事项（请先阅读注意事项再进行sdk对接）
-**_安卓SDK目前默认推荐maven对接方式_**
+/// 开屏广告加载器
+import 'package:flutter_openset_ads/loader/OSETSplashAdLoader.dart';
 
+/// 插屏广告加载器
+import 'package:flutter_openset_ads/loader/OSETInterstitialAdLoader.dart';
 
-### 对接方式：maven接入（推荐）
-#### 1、在您的android项目模块根目录的build.gradle文件中引入 adset、荣耀和gromore仓库
-``` java
-buildscript {
-    repositories {
-       .
-       .
-       .
-        // GroMore
-        maven { url "https://artifact.bytedance.com/repository/Volcengine/" }
-        maven { url "https://artifact.bytedance.com/repository/pangle" }
-//        荣耀
-        maven { url 'https://developer.hihonor.com/repo' }
-//        adset
-        maven {
-            allowInsecureProtocol = true
-            url "http://maven.shenshiads.com/nexus/repository/adset/"
-        }
-    }
-}
+/// 激励广告加载器
+import 'package:flutter_openset_ads/loader/OSETRewardVideoAdLoader.dart';
 
-allprojects {
-    repositories {
-        // GroMore
-        maven { url "https://artifact.bytedance.com/repository/Volcengine/" }
-        maven { url "https://artifact.bytedance.com/repository/pangle" }
-//        荣耀
-        maven { url 'https://developer.hihonor.com/repo' }
-//        adset
-        maven {
-            allowInsecureProtocol = true
-            url "http://maven.shenshiads.com/nexus/repository/adset/"
-        }
-    }
-}
+/// 全屏广告加载器
+import 'package:flutter_openset_ads/loader/OSETFullVideoAdLoader.dart';
+
+/// banner广告加载器
+import 'package:flutter_openset_ads/loader/OSETBannerAdLoader.dart';
+
+/// 原生信息流广告加载器
+import 'package:flutter_openset_ads/loader/OSETNativeAdLoader.dart';
 
 ```
-#### 2、在您的android项目模块app目录中的的build.gradle中引入sdk和第三方ADN
-``` java
-android {
-    ...
-    defaultConfig {
-        ...
-        multiDexEnabled true
-    }
-}
-dependencies {
+
+## 二、加载各类型广告
+目前我们支持开屏、插屏、激励、全屏、banner、信息流模版等广告类型，以及短视频模块，请按需获取。
+
+* 1、开屏广告
+具体代码请参考demo 中的 lib/SplashAdLauncherPage.dart
+```
+    // 构建开屏广告加载器
+    _splashAdLoader = OSETSplashAdLoader();
+
+    // 设置广告加载成功监听
+    _splashAdLoader?.onAdLoad = (osetAd) {
+      print('开屏广告加载成功...');
+    };
+
+    // 设置广告加载失败监听
+    _splashAdLoader?.onAdFailed = (msg) {
+      print('开屏广告加载失败, $msg');
+      _closePageSafely();
+    };
+
+    // 设置广告展示监听
+    _splashAdLoader?.onAdExpose = (osetAd) {
+      print('开屏广告展示成功...' + osetAd.adId);
+    };
+
+    // 设置广告被点击监听
+    _splashAdLoader?.onAdClick = (osetAd) {
+      print('开屏广告被点击...');
+    };
+
+    // 设置广告关闭监听
+    _splashAdLoader?.onAdClose = (osetAd) {
+      print('开屏广告被关闭...');
+      _closePageSafely();
+    };
+
+    // 加载并展示开屏广告
+    _splashAdLoader?.loadAd(
+      // 广告位ID，不同端的广告位ID可能不一致，需替换成自己相应端的广告位ID
+      posId: Platform.isAndroid ? Common.androidPosIdSplash : Common.iosPosIdSplash,
+    );
+
+    // 释放广告对象
+    _splashAdLoader?.release();
+```
+
+* 2、插屏广告
+具体代码请参考demo 中的 lib/InterstitialAdPage.dart
+```
+    // 创建插屏广告加载器
+    _interstitialAdLoader = OSETInterstitialAdLoader();
+
+    // 设置广告加载成功监听
+    _interstitialAdLoader.onAdLoad = (osetAd) {
+      print('插屏广告加载成功...');
+    };
+
+    // 设置广告加载失败监听
+    _interstitialAdLoader.onAdFailed = (msg) {
+      print('插屏广告加载失败, $msg');
+    };
+
+    // 设置广告展示监听
+    _interstitialAdLoader.onAdExpose = (osetAd) {
+      print('插屏广告展示成功...');
+    };
+
+    // 设置广告被点击监听
+    _interstitialAdLoader.onAdClick = (osetAd) {
+      print('插屏广告被点击...');
+    };
+
+    // 设置广告关闭监听
+    _interstitialAdLoader.onAdClose = (osetAd) {
+      print('插屏广告被关闭...');
+    };
+
+    // 加载插屏广告
+    _interstitialAdLoader.loadAd(
+      // 广告位ID，不同端的广告位ID可能不一致，需替换成自己相应端的广告位ID
+      posId:
+          Platform.isAndroid
+              ? Common.androidPosIdInterstitial
+              : Common.iosPosIdInterstitial,
+    );
+
+    // 释放广告对象
+    _splashAdLoader?.release();
+```
+
+* 3、激励广告
+具体代码请参考demo 中的 lib/RewardVideoAdPage.dart
+```
+    // 创建激励广告加载器
+    _rewardVideoAdLoader = OSETRewardVideoAdLoader();
+
+    // 设置广告加载成功监听
+    _rewardVideoAdLoader.onAdLoad = (osetAd) {
+      print('$TAG 激励广告加载成功...');
+    };
+
+    // 设置广告加载失败监听
+    _rewardVideoAdLoader.onAdFailed = (msg) {
+      print('$TAG 激励广告加载失败, $msg');
+    };
+
+    // 设置广告展示监听
+    _rewardVideoAdLoader.onAdExpose = (osetAd) {
+      print('$TAG 激励广告展示成功...');
+    };
+
+    // 设置广告奖励监听
+    _rewardVideoAdLoader.onAdReward = (osetAd) {
+      print('$TAG 激励广告奖励发放成功...');
+    };
+
+    // 设置广告被点击监听
+    _rewardVideoAdLoader.onAdClick = (osetAd) {
+      print('$TAG 激励广告被点击...');
+    };
+
+    // 设置广告关闭监听
+    _rewardVideoAdLoader.onAdClose = (osetAd) {
+      print('$TAG 激励广告被关闭...');
+    };
+
+    // 加载激励广告
+    _rewardVideoAdLoader.loadAd(
+      // 广告位ID，不同端的广告位ID可能不一致，需替换成自己相应端的广告位ID
+      posId:
+          Platform.isAndroid
+              ? Common.androidPosIdRewardVideo
+              : Common.iosPosIdRewardVideo,
+    );
+
+    /// 释放广告
+    _rewardVideoAdLoader.release();
+```
+
+* 4、全屏视频
+具体代码请参考demo 中的 lib/FullVideoAdPage.dart
+```
+    /// 创建全屏视频广告加载器
+    _fullVideoAdLoader = OSETFullVideoAdLoader();
+
+    // 设置广告加载成功监听
+    _fullVideoAdLoader.onAdLoad = (osetAd) {
+      print('全屏广告加载成功...');
+    };
+
+    // 设置广告加载失败监听
+    _fullVideoAdLoader.onAdFailed = (msg) {
+      print('全屏广告加载失败, $msg');
+    };
+
+    // 设置广告展示监听
+    _fullVideoAdLoader.onAdExpose = (osetAd) {
+      print('全屏广告展示成功...');
+    };
+
+    // 设置广告被点击监听
+    _fullVideoAdLoader.onAdClick = (osetAd) {
+      print('全屏广告被点击...');
+    };
+
+    // 设置广告关闭监听
+    _fullVideoAdLoader.onAdClose = (osetAd) {
+      print('全屏广告被关闭...');
+    };
+
+    /// 加载全屏广告
+    _fullVideoAdLoader.loadAd(
+      // 广告位ID，不同端的广告位ID可能不一致，需替换成自己相应端的广告位ID
+      posId:
+          Platform.isAndroid
+              ? Common.androidPosIdFullscreenVideo : ""
+              // : Common.iosPosId,
+    );
+
+    /// 释放广告
+    _fullVideoAdLoader.release();
+    super.dispose();
+```
+
+* 5、banner广告
+具体代码请参考demo lib/BannerAdPage.dart
+```
+    // 创建banner广告加载器
+    final OSETBannerAdLoader _bannerAdLoader = OSETBannerAdLoader();
+
+    // 设置广告加载成功监听
+    _bannerAdLoader.onAdLoad = (osetAd) {
+      // 将获取到广告模板广告（osetAd.bannerWidget）直接展示
+      setState(() {
+        _bannerAd = osetAd.bannerWidget;
+      });
+      _loading = false;
+      print('Banner广告加载成功...');
+    };
+
+    // 设置广告加载失败监听
+    _bannerAdLoader.onAdFailed = (msg) {
+      _loading = false;
+      print('Banner广告加载失败, $msg');
+    };
+
+    // 设置广告展示监听
+    _bannerAdLoader.onAdExpose = (osetAd) {
+      print('Banner广告展示成功...');
+    };
+
+    // 设置广告被点击监听
+    _bannerAdLoader.onAdClick = (osetAd) {
+      print('Banner广告被点击...');
+    };
+
+    // 设置广告关闭监听
+    _bannerAdLoader.onAdClose = (osetAd) {
+      print('Banner广告被关闭...');
+    };
+
+    /// 加载Banner广告
+    _bannerAdLoader.loadAd(
+      // 广告位ID，不同端的广告位ID可能不一致，需替换成自己相应端的广告位ID
+      posId:
+          Platform.isAndroid
+              ? Common.androidPosIdBanner
+              : Common.iosPosIdBanner,
+      // 广告宽度
+      adWidth: MediaQuery.of(context).size.width,
+      adHeight: 50
+    );
+
+    /// 释放广告
+    _bannerAdLoader.release();
+    super.dispose();
+```
+
+* 6、信息流模版
+具体代码请参考demo lib/NativeAdPage.dart
+```
+    /// 创建信息流模版广告加载器
+    _nativeAdLoader = OSETNativeAdLoader();
     
-    //基础包 start
-    implementation("com.shenshi:ad-openset-sdk:6.5.2.5")
-    //基础包 end
-    
-    //    百度 start
-    // 注意百度9.373版本开始，强制使用Androidx，如果使用这个版本以上的百度sdk，请将项目改为Androidx
-    implementation 'com.shenshi:ad-baidu-adapter:9.391.1'
-    //    百度 end
-    
-//    穿山甲&GroMore start
-    implementation("com.shenshi:ad-gromore-ad-adapter:6.8.4.0.1")// 纯广告SDK
+    // 设置广告加载成功监听
+    _nativeAdLoader.onAdLoad = (osetAd) {
+      _loading = false;
+      print('$TAG 信息流广告加载成功...');
+      // 将获取到广告模板广告（osetAd.nativeWidget）直接展示
+      setState(() {
+        _nativeAd = osetAd.nativeWidget;
+      });
+    };
 
-    //因为tanx会依赖第三方库 implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.8.0' 会和 gromore短剧的依赖库冲突，如果不使用tanx，请按照这个对接
-//    implementation("com.shenshi:ad-gromore-ct-adapter:6.8.4.0.1") // 包括广告和短剧内容SDK
+    // 设置广告加载失败监听
+    _nativeAdLoader.onAdFailed = (msg) {
+      _loading = false;
+      print('$TAG 信息流广告加载失败, $msg');
+    };
 
-    //因为tanx会依赖第三方库 implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.8.0' 会和 gromore短剧的依赖库冲突，如果使用tanx，请按照这个对接
-//    implementation("com.shenshi:ad-gromore-ct-adapter:6.8.4.0.1") {
-//        exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk7'
-//    }// 包括广告和短剧内容SDK
-    
-    //注意！！! 穿山甲短剧依赖okhttp，如果没有会闪退，如果已经添加请忽略，没有添加请添加okhttp，
-    //另外，tanx默认依赖okhttp，如果 已经依赖了tanx，也不需要再添加okhttp
-//    implementation 'com.squareup.okhttp3:okhttp:4.12.0'
-//    穿山甲&GroMore end
+    // 设置广告展示监听
+    _nativeAdLoader.onAdRenderSuccess = (osetAd) {
+      print('$TAG 信息流广告渲染成功...');
+    };
 
-    //sigmob start
-    implementation("com.shenshi:ad-sigmob-adapter:4.23.0.1")
-    //sigmob end
+    // 设置广告展示监听
+    _nativeAdLoader.onAdExpose = (osetAd) {
+      print('$TAG 信息流广告展示成功...');
+    };
 
-    //快手 start
-    implementation 'com.shenshi:ad-kuaishou-ad-adapter:4.4.20.1.2'// 快手-纯广告SDK
-//    implementation 'com.shenshi:ad-kuaishou-ct-adapter:3.3.76.5.2'// 快手-包括广告和内容SDK
-    //快手 end
+    // 设置广告被点击监听
+    _nativeAdLoader.onAdClick = (osetAd) {
+      print('$TAG 信息流广告被点击...');
+    };
 
-    //广点通 start
-    implementation 'com.shenshi:ad-guangdiantong-adapter:4.640.1510.1'
-    //广点通 end
+    // 设置广告关闭监听
+    _nativeAdLoader.onAdClose = (osetAd) {
+      print('$TAG 信息流广告被关闭...');
+    };
 
-    //倍孜 start
-    implementation 'com.shenshi:ad-beizi-adapter:5.2.1.6.1'
-    //倍孜 end
+    // 加载信息流广告
+    _nativeAdLoader.loadAd(
+      // 广告位ID，不同端的广告位ID可能不一致，需替换成自己相应端的广告位ID
+      posId:
+      Platform.isAndroid
+          ? Common.androidPosIdNative
+          : Common.iosPosIdNative,
+      // 广告宽度
+      adWidth: MediaQuery.of(context).size.width,
+    );
 
-    //tanx start
-    implementation 'com.shenshi:ad-tanx-adapter:3.7.13.1'
-    //tanx end
-
-    //海量 start
-    implementation 'com.shenshi:ad-hailiang-adapter:3.470.13.436.1'
-    //海量 end
-
-    //章鱼 start
-    implementation 'com.shenshi:ad-zhangyu-adapter:1.6.3.6.1'
-    //章鱼 end
-
-    // 京东 start
-    //京东 androidx环境请使用
-    implementation 'com.shenshi:ad-jingdong-androidx-adapter:2.6.32.1'
-
-    //京东 support环境请使用
-//    implementation 'com.shenshi:ad-jingdong-support-adapter:2.6.32.1'
-    // 京东 end
-
-    //multidex 64K问题，如果已添加请忽略
-    implementation 'com.android.support:multidex:1.0.3'
-    
-    //微信小程序广告预算相关，引入可提升ecpm。强烈建议引入
-    /**
-     * 1，进入微信开放平台创建移动应用;
-     * 2，应用创建完成后，获取到相应的微信ApplD;
-     * 3.在移动端嵌入最新版OpenSDK，并确认版本为5.3.1及以上;
-     * 4.在优量汇开发者平台，将微信开放平台填写的AppID与当前应用进行关联;
-     * 第四步联系我们运营帮你们配置
-     */
-    implementation 'com.tencent.mm.opensdk:wechat-sdk-android:6.8.28'
-    
-}
+    /// 释放广告
+    _nativeAdLoader.release();
 ```
 
-
-
-#### 3、安卓sdk版本最低21
-android项目模块目录下`android/app/build.gradle`中修改`minSdkVersion 21`
-
-
-
-####   4、混淆配置
-1、拷⻉ `android/app` ⽬录下`proguard-rules.pro`混淆文件到你项目中对应的`android/app/` ⽬录下
-2、配置混淆文件，在您的android模块`android/app/build.gradle`文件中增加以下内容
-``` java  
-     buildTypes {
-            release {
-                proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-                signingConfig signingConfigs.debug
-            }
-            debug {
-                proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-                signingConfig signingConfigs.debug
-            }
-    }
+* 7、短视频模块
+具体代码请参考demo lib/VideoContentPage.dart
 ```
+    /// 创建短视频加载器
+    _videoContentLoader = OSETVideoContentLoader();
 
+    _videoContentLoader.onAdLoad = (osetAd) {
+      print('$TAG 短视频加载成功...');
+    };
+    _videoContentLoader.onAdFailed = (msg) {
+      print('$TAG 短视频加载失败, $msg');
+    };
+    _videoContentLoader.onAdTimeOver = (osetAd) {
+      print('$TAG 短视频回调奖励...');
+    };
+
+    _videoContentLoader.loadAd(
+      // 广告位ID，不同端的广告位ID可能不一致，需替换成自己相应端的广告位ID
+      posId:
+          Platform.isAndroid
+              ? Common.androidPosIdVideoPage
+              : Common.iosPosIdVideoPage,
+      standPage: standPage,
+      // 可刷新奖励次数
+      rewardCount: rewardCount,
+      // 每次刷新奖励所需观看的时间
+      rewardDownTime: rewardDownTime,
+    );
+
+    /// 释放广告
+    _videoContentLoader.release();
+```
 
 ### 安卓测试id
 
-| appkey | E6097975B89E83D6 |
-|----------|-----------|
-| 开屏广告位id | 7D5239D8D88EBF9B6D317912EDAC6439 |
-| 插屏广告位id | 1D273967F51868AF2C4E080D496D06D0 |
+| appkey     | E6097975B89E83D6 |
+|------------|-----------|
+| 开屏广告位id    | 7D5239D8D88EBF9B6D317912EDAC6439 |
+| 插屏广告位id    | 1D273967F51868AF2C4E080D496D06D0 |
 | banner广告位id | 107EB50EDFE65EA3306C8318FD57D0B3 |
-| 激励视频广告位id | 09A177D681D6FB81241C3DCE963DCB46 |
-| 全屏视频广告位id | D879C3DED01D5CE319CD2751474BA8E4 |
-| 信息流（原生）广告位id | 89FEEA66F9228ED3F6420294B89A902B |
-| 短视频内容模块id | C5F4F13C421B10664D9D21EDB52C8C5D |
-| 信息流内容模块id | 4EC4251D616C69030A161A930A938596 |
-| 信息流内容模块2id | EBE266AAE65F52C37A28BF2D586132EB |
-| 悬浮窗模块id | C20D0FDCA88E06E6718A33279AAD2B4D |
+| 激励视频广告位id  | 09A177D681D6FB81241C3DCE963DCB46 |
+| 全屏视频广告位id  | D879C3DED01D5CE319CD2751474BA8E4 |
+| 模版信息流广告位id | 89FEEA66F9228ED3F6420294B89A902B |
+| 短视频内容模块id  | C5F4F13C421B10664D9D21EDB52C8C5D |
 
 
 ## iOS配置
@@ -287,104 +467,3 @@ android项目模块目录下`android/app/build.gradle`中修改`minSdkVersion 21
 | ios测试_插屏           | 351C1A89F8AE79DF62C1B1165A5EAFCC |
 | ios测试_banner       | 7B2BD37383E008B422C93486EACEA11D |
 | ios测试_开屏           | 18666EAA65EC1969E90E982DCA2CB2DD |
-
-
-## 广告接口
-
-可以直接参考 `lib/main.dart` 文件，默认的都是测试appkey和测试广告位id
-
-###   初始化
-```
-    *   详情参考 /lib/main.dart- init()
-    *   **建议一进来app的`initState` 生命周期就要初始化sdk(必须在调用广告之前)**
-        /// 初始化⼴告 SDK
-        /// [appId] App申请的id
-        /// [isDebug] 是否为测试模式
-        FlutterPluginAd.initAd(appId, isDebug: true);
-```        
-
-###   检查并请求权限（仅 Android）
-``` 
-    *   检查并请求权限（仅 Android，iOS调用则会检查广告追踪权限（IDFA））
-    *   **建议app中必须调用权限，有助于提升广告收入**
-    ```
-    /// 检查并请求权限（仅 Android）
-    FlutterPluginAd.checkAndReqPermission();
-
-```
-
-###   添加⼴告监听
-```
-    *   详情参考 /lib/main.dart- setAdEvent(),监听状态见 /flutter\_plugin\_ad/lib/entity/ad\_event.dart```
-        // 添加⼴告监听
-        FlutterPluginAd.onEventListener((event) {
-        setState(() {
-            _adEvent = 'type:${event.eventType} msg:${event.msg}';
-        });
-        }, (error) {
-        setState(() {
-            StringBuffer sb = new StringBuffer();
-            sb.write(error);
-            // _adEvent = 'code:${code} msg:${msg}';
-            // PlatformException err = error
-            _adEvent = '${sb.toString()}';
-        });
-        });
-        
-```
-###   展示开屏⼴告
-```
-    *   详情参考 /lib/main.dart- showSplashAd()
-        
-        ```
-        /// 展示开屏⼴告
-        /// [posIdSplash] ⼴告配置 posIdSplash
-        FlutterPluginAd.showSplashAd(posIdSplashsId);
-```
-
-###   展示插屏⼴告
-```    
-    *   详情参考 /lib/main.dart- showInterstitialAd()
-        
-        /// 展示插屏⼴告
-        /// [posIdInterstitial] ⼴告配置 posIdInterstitial
-        FlutterPluginAd.showInterstitialAd(posIdInterstitial);
-```
-
-###   展示全屏视频⼴告
-```    
-    *   详情参考 /lib/main.dart- showFullscreenVideoAd()
-        
-        /// 展示全屏视频⼴告
-        /// [posIdFullVideo] ⼴告配置 posIdFullVideo
-        FlutterPluginAd.showFullscreenVideoAd(posIdFullVideo);
-```
-
-###   展示激励视频⼴告
-```
-    *   详情参考 /lib/main.dart- showRewardVideoAd()
-        
-        /// 展示激励视频⼴告
-        /// [posIdRewardVideo] ⼴告配置 posIdRewardVideo
-        FlutterPluginAd.showRewardVideoAd(posIdRewardVideo);
-```
-
-###   Banner ⼴告
-```
-    *   详情参考 /lib/page/banner_page.dart 或者 lib/main.dart 中的(展示 Banner 广告)
-        
-        /// 这⾥ BannerAd 是⼀个 Widget ，你可以放到任何 Flutter 组件上
-        /// [adId] ⼴告配置 adIdBanner
-        // 注意，(安卓如果不设置高度，那么会默认填充整个父Widget)(iOS需传后面的height参数作为高度，如果不传则使用默认高度)
-        SizedBox(height: 50, child: BannerAdWidget(adId: adIdBanner, height: '50')));
-```
-
-###   原生信息流⼴告
-```
-    *   详情参考 /lib/page/native_page.dart 或者 lib/main.dart 中的(展示原生信息流广告)
-        
-        /// 这⾥ NativeAd 是⼀个 Widget ，你可以放到任何 Flutter 组件上
-        /// [adId] ⼴告配置 adIdNative
-        // 注意，(安卓如果不设置高度，那么会默认填充整个父Widget)(iOS需传后面的height参数作为高度，如果不传则使用默认高度)
-        SizedBox(height: 310, child: NativeAdWidget(adId: adIdNative, height: '310')));
-```

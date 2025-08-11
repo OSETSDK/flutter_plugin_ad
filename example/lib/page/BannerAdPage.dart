@@ -57,6 +57,7 @@ class _BannerAdState extends State<BannerAdPage> {
 
     // 设置广告加载成功监听
     _bannerAdLoader.onAdLoad = (osetAd) {
+      // 将获取到广告模板广告（osetAd.bannerWidget）直接展示
       setState(() {
         _bannerAd = osetAd.bannerWidget;
       });

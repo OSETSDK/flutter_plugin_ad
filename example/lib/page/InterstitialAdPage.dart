@@ -78,7 +78,6 @@ class _InterstitialState extends State<InterstitialAdPage> {
   }
 
   /// 加载插屏广告
-  /// loadThenShow 广告加载成功后是否立即展示
   void _loadInterstitialAd({required bool loadThenShow}) {
     // 加载插屏广告
     _interstitialAdLoader.loadAd(

@@ -2,7 +2,6 @@
 import 'dart:io';
 
 import 'package:example/common/Common.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_openset_ads/loader/OSETSplashAdLoader.dart';
 
