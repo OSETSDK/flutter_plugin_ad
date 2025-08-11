@@ -97,6 +97,7 @@ class _RewardVideoAdState extends State<RewardVideoAdPage> {
           Platform.isAndroid
               ? Common.androidPosIdRewardVideo
               : Common.iosPosIdRewardVideo,
+      userId: '123',
     );
   }
 }

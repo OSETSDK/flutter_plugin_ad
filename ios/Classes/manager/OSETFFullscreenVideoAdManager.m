@@ -28,11 +28,10 @@
 }
 
 /// 加载开屏广告
-- (void)loadFullscreenVideoAd:(OSETAdModel *)adParams isRequestIdfa:(bool)isRequestIdfa {
+- (void)loadFullscreenVideoAd:(OSETAdModel *)adParams {
     OSETFFullscreenVideoAd *fullscreenVideoAd = [OSETFFullscreenVideoAd alloc];
     fullscreenVideoAd.adParams = adParams;
-    fullscreenVideoAd.isRequestIdfa = isRequestIdfa;
-    
+    fullscreenVideoAd.isRequestIdfa = YES;    
     NSString *adId = adParams.adId;
     [_fullscreenVideoAdMap setObject:fullscreenVideoAd forKey:adId];
     

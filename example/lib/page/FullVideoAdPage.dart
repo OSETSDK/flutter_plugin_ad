@@ -24,7 +24,10 @@ class _FullVideoAdState extends State<FullVideoAdPage> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 40.0, horizontal: 24.0),
+            padding: const EdgeInsets.symmetric(
+              vertical: 40.0,
+              horizontal: 24.0,
+            ),
             child: SizedBox(
               width: double.infinity,
               child: buildCommonButton(
@@ -83,8 +86,8 @@ class _FullVideoAdState extends State<FullVideoAdPage> {
       // 广告位ID，不同端的广告位ID可能不一致，需替换成自己相应端的广告位ID
       posId:
           Platform.isAndroid
-              ? Common.androidPosIdFullscreenVideo : ""
-              // : Common.iosPosId,
+              ? Common.androidPosIdFullscreenVideo
+              : Common.iosPosIdFullscreenVideo,
     );
   }
 }

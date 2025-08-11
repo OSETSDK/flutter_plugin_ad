@@ -19,6 +19,8 @@ class Common {
   static const String iosPosIdSplash = "18666EAA65EC1969E90E982DCA2CB2DD";
   static const String iosPosIdInterstitial = "351C1A89F8AE79DF62C1B1165A5EAFCC";
   static const String iosPosIdRewardVideo = "E80DABEF5FD288492D4A9D05BF84E417";
+  static const String iosPosIdFullscreenVideo =
+      "8FCB39267CE40245B87EF8835A853708";
   static const String iosPosIdBanner = "7B2BD37383E008B422C93486EACEA11D";
   static const String iosPosIdNative = "921DE1BF1B3F06838AE04233A42B01F1";
   static const String iosPosIdVideoPage = "E06C7BB2C34605B4CD777EFD590DD4BE";
