@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -29,7 +30,7 @@ class _BannerAdWidgetState<T extends OSETBannerWidget> extends State<T> {
         ? SizedBox(width: widget.osetBannerAd.adWidth, height: 0)
         : Container(
       width: widget.osetBannerAd.adWidth,
-      height: widget.osetBannerAd.adHeight,
+      height: max(widget.osetBannerAd.adHeight, 1),
       constraints: BoxConstraints(maxWidth: widget.osetBannerAd.adWidth),
       child: Platform.isAndroid
           ? AndroidView(

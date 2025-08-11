@@ -42,7 +42,7 @@ public class OSETBannerAdManager implements OnAdReleaseListener {
     }
 
     public void loadBannerAd(Activity activity, String posId, String adId) {
-        Log.d(TAG, "Banner广告加载预备, posId: " + posId + ", adId=" + adId);
+//        Log.d(TAG, "Banner广告加载预备, posId: " + posId + ", adId=" + adId);
         if (activity == null || activity.isFinishing()) {
             Log.d(TAG, "Banner广告加载失败, posId: " + posId + ", error: 当前上下文不适合获取信息流广告!");
             PluginAdSetDelegate.getInstance().postEvent(adId, "当前上下文不适合获取信息流广告", OSETAdEvent.onAdError);

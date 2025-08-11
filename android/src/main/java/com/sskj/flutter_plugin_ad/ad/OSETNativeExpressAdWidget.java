@@ -5,7 +5,6 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
@@ -29,12 +28,11 @@ public class OSETNativeExpressAdWidget implements PlatformView {
     private static final String TAG = "adset_plugin";
     private FrameLayout parent;
     private FrameLayout adContainer;
-    private CstOnGlobalLayoutListener onGlobalLayoutListener;
 
     public OSETNativeExpressAdWidget(@NonNull Context context, String adId, double adWidth) {
         float density = context.getResources().getDisplayMetrics().density;
         int width = adWidth > 0 ? (int) (density * adWidth) : ViewGroup.LayoutParams.MATCH_PARENT;
-        Log.d(TAG, "宽度: " + width + ", density: " + density);
+//        Log.d(TAG, "宽度: " + width + ", density: " + density);
 
         parent = new FrameLayout(context);
         parent.setMinimumWidth(width);
@@ -45,23 +43,48 @@ public class OSETNativeExpressAdWidget implements PlatformView {
             OSETNativeAd nativeAd = osetNativeExpressAd.getNativeAd();
             View expressAdView = osetNativeExpressAd.getExpressAdView();
             if (nativeAd != null && nativeAd.isUsable() && expressAdView != null) {
+                // 手动测量广告View的高度
+                int measureHeight = measureAdHeight(context, expressAdView);
+
                 // 新建广告容器并将广告填入
                 adContainer = new FrameLayout(context);
-                adContainer.setLayoutParams(new ViewGroup.LayoutParams(width, context.getResources().getDisplayMetrics().heightPixels));
+                adContainer.setLayoutParams(new ViewGroup.LayoutParams(width, measureHeight));
 
                 // 广告填入广告容器中
                 adContainer.addView(expressAdView);
 
+                // 加载并渲染信息流模板广告
+                if (adContainer.getChildCount() > 0) {
+                    ViewGroup.LayoutParams layoutParams = adContainer.getChildAt(0).getLayoutParams();
+                    if (layoutParams instanceof FrameLayout.LayoutParams) {
+                        ((FrameLayout.LayoutParams) layoutParams).gravity = Gravity.TOP;
+                    }
+                }
+
                 // 将广告容器放到FlutterView中
                 parent.addView(adContainer);
 
-                // 监听广告布局变化，通知Flutter端改变parent的大小（Flutter端默认是无限高度，所以需要计算广告高度之后让Flutter端设置确切的高度）
-                ViewTreeObserver viewTreeObserver = expressAdView.getViewTreeObserver();
-                if (viewTreeObserver != null) {
-                    viewTreeObserver.addOnGlobalLayoutListener(onGlobalLayoutListener = new CstOnGlobalLayoutListener(adId, expressAdView));
-                }
+                // 回调测量后的广告布局高度给flutter容器
+                Map<String, Object> extras = new HashMap<>();
+                extras.put("adId", adId);
+                extras.put("adEvent", OSETAdEvent.onAdMeasured);
+                extras.put("adWidth", width / density);
+                extras.put("adHeight", measureHeight / density);
+                PluginAdSetDelegate.getInstance().postEvent(extras);
             }
         }
+    }
+
+    private int measureAdHeight(Context context, View expressAdView) {
+        int widthSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
+        int heightSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
+        expressAdView.measure(widthSpec, heightSpec);
+        int height = expressAdView.getMeasuredHeight();
+        if (height == 0) {
+            height = context.getResources().getDisplayMetrics().heightPixels;
+        }
+        Log.d(TAG, "测量高度: " + height);
+        return height;
     }
 
     @Nullable
@@ -76,10 +99,6 @@ public class OSETNativeExpressAdWidget implements PlatformView {
 
     public void release() {
         try {
-            if (this.onGlobalLayoutListener != null) {
-                this.onGlobalLayoutListener.release();
-                this.onGlobalLayoutListener = null;
-            }
 
             if (this.parent != null) {
                 this.parent.removeAllViews();
@@ -89,52 +108,4 @@ public class OSETNativeExpressAdWidget implements PlatformView {
         }
     }
 
-    public static class CstOnGlobalLayoutListener implements ViewTreeObserver.OnGlobalLayoutListener {
-        private final String adId;
-        private View expressAdView;
-        private int preWidth = -1;
-        private int preHeight = -1;
-
-        public CstOnGlobalLayoutListener(String adId, @NonNull View nativeExpressAdView) {
-            this.adId = adId;
-            this.expressAdView = nativeExpressAdView;
-        }
-
-        @Override
-        public void onGlobalLayout() {
-            if (expressAdView == null) return;
-            int width = expressAdView.getWidth();
-            int height = expressAdView.getHeight();
-            Log.d(TAG, "广告生效宽高：" + width + ", " + height);
-
-            if (width > 0 && height > 0) {
-                if (width > preWidth || height > preHeight) {
-                    float density = expressAdView.getResources().getDisplayMetrics().density;
-                    if (height / density < 48) return;
-                    Log.d(TAG, "广告生效宽高: " + width + ", " + height);
-
-                    Map<String, Object> extras = new HashMap<>();
-                    extras.put("adId", adId);
-                    extras.put("adEvent", OSETAdEvent.onAdMeasured);
-                    extras.put("adWidth", width / density);
-                    extras.put("adHeight", height / density);
-                    PluginAdSetDelegate.getInstance().postEvent(extras);
-
-                    preWidth = width;
-                    preHeight = height;
-                }
-            }
-        }
-
-        public void release() {
-            Log.d(TAG, "释放资源: ");
-            if (expressAdView != null) {
-                ViewTreeObserver viewTreeObserver = expressAdView.getViewTreeObserver();
-                if (viewTreeObserver != null) {
-                    viewTreeObserver.removeOnGlobalLayoutListener(this);
-                }
-                expressAdView = null;
-            }
-        }
-    }
 }

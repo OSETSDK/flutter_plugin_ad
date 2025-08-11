@@ -2,9 +2,9 @@ package com.sskj.flutter_plugin_ad.ad;
 
 import android.content.Context;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
@@ -26,12 +26,12 @@ import io.flutter.plugin.platform.PlatformView;
 public class OSETBannerExpressAdWidget implements PlatformView {
     private static final String TAG = "adset_plugin";
     private FrameLayout parent;
-    private CstOnGlobalLayoutListener onGlobalLayoutListener;
+    private FrameLayout adContainer;
 
     public OSETBannerExpressAdWidget(@NonNull Context context, String adId, double adWidth) {
         float density = context.getResources().getDisplayMetrics().density;
         int width = adWidth > 0 ? (int) (density * adWidth) : ViewGroup.LayoutParams.MATCH_PARENT;
-        Log.d(TAG, "宽度: " + width + ", density: " + density);
+//        Log.d(TAG, "宽度: " + width + ", density: " + density);
 
         this.parent = new FrameLayout(context);
         this.parent.setMinimumWidth(width);
@@ -41,17 +41,48 @@ public class OSETBannerExpressAdWidget implements PlatformView {
         if (osetBannerExpressAd != null && osetBannerExpressAd.getBannerAd() != null && osetBannerExpressAd.getBannerAd().isUsable()) {
             View bannerAdView = osetBannerExpressAd.getBannerAdView();
             if (bannerAdView != null) {
-                // 新建广告容器并将广告填入
-                this.parent.addView(bannerAdView);
+                // 手动测量广告View的高度
+                int measureHeight = measureAdHeight(context, bannerAdView);
 
-                // 监听广告布局变化，通知Flutter端改变parent的大小（Flutter端默认是无限高度，所以需要计算广告高度之后让Flutter端设置确切的高度）
-                ViewTreeObserver viewTreeObserver = bannerAdView.getViewTreeObserver();
-                if (viewTreeObserver != null) {
-                    onGlobalLayoutListener = new CstOnGlobalLayoutListener(adId, bannerAdView);
-                    viewTreeObserver.addOnGlobalLayoutListener(onGlobalLayoutListener);
+                // 新建广告容器并将广告填入
+                adContainer = new FrameLayout(context);
+                adContainer.setLayoutParams(new ViewGroup.LayoutParams(width, measureHeight));
+
+                // 加载并渲染信息流模板广告
+                if (adContainer.getChildCount() > 0) {
+                    ViewGroup.LayoutParams layoutParams = adContainer.getChildAt(0).getLayoutParams();
+                    if (layoutParams instanceof FrameLayout.LayoutParams) {
+                        ((FrameLayout.LayoutParams) layoutParams).gravity = Gravity.TOP;
+                    }
                 }
+
+                // 广告填入广告容器中
+                adContainer.addView(bannerAdView);
+
+                // 新建广告容器并将广告填入
+                this.parent.addView(adContainer);
+
+                // 回调测量后的广告布局高度给flutter容器
+                Map<String, Object> extras = new HashMap<>();
+                extras.put("adId", adId);
+                extras.put("adEvent", OSETAdEvent.onAdMeasured);
+                extras.put("adWidth", width / density);
+                extras.put("adHeight", measureHeight / density);
+                PluginAdSetDelegate.getInstance().postEvent(extras);
             }
         }
+    }
+
+    private int measureAdHeight(Context context, View expressAdView) {
+        int widthSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
+        int heightSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
+        expressAdView.measure(widthSpec, heightSpec);
+        int height = expressAdView.getMeasuredHeight();
+        if (height == 0) {
+            height = ViewGroup.LayoutParams.WRAP_CONTENT;
+        }
+        Log.d(TAG, "测量高度: " + height);
+        return height;
     }
 
 
@@ -67,68 +98,11 @@ public class OSETBannerExpressAdWidget implements PlatformView {
 
     public void release() {
         try {
-            if (this.onGlobalLayoutListener != null) {
-                this.onGlobalLayoutListener.release();
-                this.onGlobalLayoutListener = null;
-            }
-
             if (this.parent != null) {
                 this.parent.removeAllViews();
             }
         } catch (Throwable e) {
             e.printStackTrace();
-        }
-    }
-
-    public static class CstOnGlobalLayoutListener implements ViewTreeObserver.OnGlobalLayoutListener {
-        private final String adId;
-        private View bannerAdView;
-        private int preWidth = -1;
-        private int preHeight = -1;
-
-        public CstOnGlobalLayoutListener(String adId, @NonNull View bannerAdView) {
-            this.adId = adId;
-            this.bannerAdView = bannerAdView;
-        }
-
-        @Override
-        public void onGlobalLayout() {
-            if (bannerAdView == null) return;
-            int width = bannerAdView.getMeasuredWidth();
-            int height = bannerAdView.getMeasuredHeight();
-
-            if (width > 0 && height > 0) {
-                if (width > preWidth || height > preHeight) {
-                    float density = bannerAdView.getResources().getDisplayMetrics().density;
-                    if (height / density < 48) return;
-//                    int expectedHeight = (int) (width * (9.0 / 16.0));
-//                    if (height > expectedHeight) {
-//                        height = expectedHeight;
-//                    }
-                    Log.d(TAG, "onGlobalLayout: " + width + ", " + height);
-
-                    Map<String, Object> extras = new HashMap<>();
-                    extras.put("adId", adId);
-                    extras.put("adEvent", OSETAdEvent.onAdMeasured);
-                    extras.put("adWidth", width / density);
-                    extras.put("adHeight", height / density);
-                    PluginAdSetDelegate.getInstance().postEvent(extras);
-
-                    preWidth = width;
-                    preHeight = height;
-                }
-            }
-        }
-
-        public void release() {
-            Log.d(TAG, "释放资源: ");
-            if (bannerAdView != null) {
-                ViewTreeObserver viewTreeObserver = bannerAdView.getViewTreeObserver();
-                if (viewTreeObserver != null) {
-                    viewTreeObserver.removeOnGlobalLayoutListener(this);
-                }
-                bannerAdView = null;
-            }
         }
     }
 }

@@ -51,7 +51,7 @@ public class OSETNativeExpressAd {
 
                         @Override
                         public void onRenderSuccess(View view) {
-                            Log.d(TAG, "信息流渲染成功1: " + activity);
+                            Log.d(TAG, "信息流渲染成功: ");
                             expressAdView = view;
                             postEvent(adId, "", OSETAdEvent.onAdLoaded);
                             postEvent(adId, "", OSETAdEvent.onAdRenderSuccess);

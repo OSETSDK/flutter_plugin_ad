@@ -675,7 +675,7 @@ public class PluginAdSetDelegate implements PluginRegistry.ActivityResultListene
     /// 发送事件消息给flutter
     public void postEvent(Map<String, Object> map) {
         if (_eventChannel != null && map != null) {
-            Log.d(TAG, "调用flutter 传参 map:" + map);
+//            Log.d(TAG, "调用flutter 传参 map:" + map);
             _eventChannel.success(map);
         }
     }
