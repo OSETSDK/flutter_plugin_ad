@@ -87,7 +87,7 @@
             [eventData addEntriesFromDictionary:extras];
         }
         // 发送事件
-        NSLog(@"IOS 回调flutter %@ - %@",eventName,eventData);
+//        NSLog(@"IOS 回调flutter %@ - %@",eventName,eventData);
         self.eventSink(eventData);
     });
 }

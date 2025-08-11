@@ -64,7 +64,7 @@ static FlutterPluginAdPlugin *manager = nil;
     return manager;
 }
 - (void)handleMethodCall:(FlutterMethodCall*)call result:(FlutterResult)result {
-    NSLog(@"flutter调用原生 %@ - %@",call.method,call.arguments);
+//    NSLog(@"flutter调用原生 %@ - %@",call.method,call.arguments);
     OSETAdModel * adParams = [OSETAdModel new];
     NSDictionary *arguments = call.arguments;
     [adParams handleInit:arguments];
@@ -154,9 +154,13 @@ static FlutterPluginAdPlugin *manager = nil;
       }
   } else {
     result(FlutterMethodNotImplemented);
-      NSLog(@"OC没有找到方法%@",call.method);
+      NSLog(@"OC没有找到方法%@ 或ios暂不支持",call.method);
   }
 }
+//static const methodLoadBannerAd = "loadBannerAd";
+//static const methodLoadNativeAd = "loadNativeAd";
+//static const methodShowVideoPage = "showVideoPage";
+//static const methodShowKsVideoFragment = "showKsVideoFragment";
 #pragma make NULL 判断字符是否为空
 -(BOOL)isNotNull:(id)velue{
     if (velue && ![velue isKindOfClass:[NSNull class]]) {
