@@ -98,7 +98,9 @@ class _VideoContentState extends State<VideoContentPage> {
               ? Common.androidPosIdVideoPage
               : Common.iosPosIdVideoPage,
       standPage: standPage,
+      // 可刷新奖励次数
       rewardCount: rewardCount,
+      // 每次刷新奖励所需观看的时间
       rewardDownTime: rewardDownTime,
     );
   }
