@@ -7,6 +7,6 @@
 @property (nonatomic,strong) OSETRewardVideoAd *rewardVideoAd;
 @property (nonatomic,strong) OSETFullscreenVideoAd *fullscreenVideoAd;
 @property (nonatomic,strong) FlutterViewController * rootVC;
-@property (nonatomic, copy) FlutterEventSink eventSink;
 + (instancetype)shareInstance;
+
 @end

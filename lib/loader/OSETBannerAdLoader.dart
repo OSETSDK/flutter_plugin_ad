@@ -35,4 +35,20 @@ class OSETBannerAdLoader extends OSETAdLoader<OSETBannerAd> {
     );
     return super.onAdLoadCallback(osetAd);
   }
+
+  /// 广告视图测量回调
+  onAdMeasured(OSETBannerAd osetAd, double width, double height) {
+    print('adset_plugin 广告试图测量高度回调 $height');
+    if (osetAd.refreshAdHeight(height)) {
+      _checkUpdateWidget(osetAd);
+    }
+  }
+
+  /// 尝试更新广告视图
+  void _checkUpdateWidget(OSETBannerAd osetAd) {
+    var mounted = osetAd.globalKey?.currentState?.mounted ?? false;
+    if (mounted) {
+      osetAd.globalKey?.currentState?.update();
+    }
+  }
 }

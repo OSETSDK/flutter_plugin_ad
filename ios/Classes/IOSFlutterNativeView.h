@@ -16,8 +16,14 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic,strong) OSETNativeAd *nativeAd;
 @property (nonatomic,assign) CGRect nativeFrame;
 
--(id)initWithAdId:(NSString *)adId withFrame:(CGRect)frame;
+-(instancetype)initWithWithFrame:(CGRect)frame
+                  viewIdentifier:(int64_t)viewId
+                       arguments:(id _Nullable)args
+                 binaryMessenger:(NSObject<FlutterBinaryMessenger>*)messenger;
 
 @end
 
 NS_ASSUME_NONNULL_END
+
+
+

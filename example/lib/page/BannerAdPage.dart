@@ -45,10 +45,7 @@ class _BannerAdState extends State<BannerAdPage> {
           ),
 
           /// banner广告容器
-          SizedBox(
-            width: double.infinity,
-            child: _bannerAd,
-          ),
+          SizedBox(width: double.infinity, child: _bannerAd),
         ],
       ),
     );
@@ -108,7 +105,7 @@ class _BannerAdState extends State<BannerAdPage> {
               : Common.iosPosIdBanner,
       // 广告宽度
       adWidth: MediaQuery.of(context).size.width,
-      adHeight: 50
+      adHeight: 50,
     );
   }
 }

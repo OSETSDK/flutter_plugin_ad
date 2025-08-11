@@ -1,7 +1,9 @@
 import 'package:flutter_openset_ads/OSETAd.dart';
 import 'package:flutter_openset_ads/OSETAdSDK.dart';
 import 'package:flutter_openset_ads/loader/OSETAdLoader.dart';
+import 'package:flutter_openset_ads/loader/OSETBannerAdLoader.dart';
 import 'package:flutter_openset_ads/loader/OSETNativeAdLoader.dart';
+import 'package:flutter_openset_ads/widget/banner/OSETBannerAd.dart';
 import 'package:flutter_openset_ads/widget/native/OSETNativeAd.dart';
 
 class OSETAdManager {
@@ -105,6 +107,9 @@ class OSETAdManager {
         double adWidth = arguments[OSETAdSDK.keyAdWidth] ?? 0;
         double adHeight = arguments[OSETAdSDK.keyAdHeight] ?? 0;
         if (osetAdLoader is OSETNativeAdLoader && osetAd is OSETNativeAd) {
+          osetAdLoader.onAdMeasured(osetAd, adWidth, adHeight);
+        }
+        if (osetAdLoader is OSETBannerAdLoader && osetAd is OSETBannerAd) {
           osetAdLoader.onAdMeasured(osetAd, adWidth, adHeight);
         }
         break;

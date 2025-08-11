@@ -10,7 +10,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface IOSFlutterNativeViewFactory : NSObject<FlutterPlatformViewFactory>
-+ (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar> *)registrar;
+- (instancetype)initWithMessenger:(NSObject<FlutterBinaryMessenger>*)messager;
 
 @end
 
