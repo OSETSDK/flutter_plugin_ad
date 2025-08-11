@@ -33,7 +33,7 @@ class _NativeAdWidgetState<T extends OSETNativeWidget> extends State<T> {
         ? SizedBox(width: widget.osetNativeAd.adWidth, height: 0)
         : Container(
             width: widget.osetNativeAd.adWidth,
-            height: widget.osetNativeAd.adHeight,
+            height: max(widget.osetNativeAd.adHeight, 1),
             constraints: BoxConstraints(maxWidth: widget.osetNativeAd.adWidth),
             child: Platform.isAndroid
                 ? AndroidView(

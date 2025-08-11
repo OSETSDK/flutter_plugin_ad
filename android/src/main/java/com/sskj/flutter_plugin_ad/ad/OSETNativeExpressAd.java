@@ -15,7 +15,7 @@ import com.sskj.flutter_plugin_ad.PluginAdSetDelegate;
  * @author Nnnn
  * @date 2025/8/7
  */
-public class OSETNativeExpressAd implements OSETNativeListener {
+public class OSETNativeExpressAd {
     private static final String TAG = "adset_plugin";
     private final String posId;
     private final String adId;
@@ -30,53 +30,55 @@ public class OSETNativeExpressAd implements OSETNativeListener {
     }
 
     public void loadAd() {
-        OSETNative.getInstance().setContext(activity).setPosId(posId).loadAd(new OSETNativeAdLoadListener() {
-            @Override
-            public void onLoadSuccess(OSETNativeAd osetNativeAd) {
-                Log.d(TAG, "信息流加载成功: ");
-                OSETNativeExpressAd.this.osetNativeAd = osetNativeAd;
-                postEvent(adId, "", OSETAdEvent.onAdLoaded);
-                osetNativeAd.render(activity, OSETNativeExpressAd.this);
-            }
+        if (activity != null) {
+            OSETNative.getInstance().setContext(activity).setPosId(posId).loadAd(new OSETNativeAdLoadListener() {
+                @Override
+                public void onLoadSuccess(OSETNativeAd osetNativeAd) {
+                    Log.d(TAG, "信息流加载成功，立即渲染: ");
+                    OSETNativeExpressAd.this.osetNativeAd = osetNativeAd;
+                    osetNativeAd.render(activity, new OSETNativeListener() {
+                        @Override
+                        public void onClick(View view) {
+                            postEvent(adId, "", OSETAdEvent.onAdClicked);
+                        }
 
-            @Override
-            public void onLoadFail(String s, String s1) {
-                Log.e(TAG, "信息流加载失败: ");
-                postEvent(adId, "广告加载失败：" + s + ", s1：" + s1, OSETAdEvent.onAdError);
-                release();
-            }
-        });
-    }
+                        @Override
+                        public void onClose(View view) {
+                            postEvent(adId, "", OSETAdEvent.onAdClosed);
+                            PluginAdSetDelegate.getInstance().loopNotifyOnAdRelease(adId);
+                            release();
+                        }
 
-    @Override
-    public void onClick(View view) {
-        postEvent(adId, "", OSETAdEvent.onAdClicked);
-    }
+                        @Override
+                        public void onRenderSuccess(View view) {
+                            Log.d(TAG, "信息流渲染成功1: " + activity);
+                            expressAdView = view;
+                            postEvent(adId, "", OSETAdEvent.onAdLoaded);
+                            postEvent(adId, "", OSETAdEvent.onAdRenderSuccess);
+                        }
 
-    @Override
-    public void onClose(View view) {
-        postEvent(adId, "", OSETAdEvent.onAdClosed);
-        PluginAdSetDelegate.getInstance().loopNotifyOnAdRelease(adId);
-        release();
-    }
+                        @Override
+                        public void onShow(View view) {
+                            Log.d(TAG, "信息流曝光: " + view.getHeight());
+                            postEvent(adId, "", OSETAdEvent.onAdExposure);
+                        }
 
-    @Override
-    public void onRenderSuccess(View view) {
-        Log.d(TAG, "信息流渲染成功: ");
-        this.expressAdView = view;
-        postEvent(adId, "", OSETAdEvent.onAdRenderSuccess);
-    }
+                        @Override
+                        public void onError(String s, String s1) {
+                            Log.d(TAG, "信息流渲染失败: ");
+                            postEvent(adId, "广告渲染失败：" + s + ", s1：" + s1, OSETAdEvent.onAdError);
+                        }
+                    });
+                }
 
-    @Override
-    public void onShow(View view) {
-        Log.d(TAG, "信息流曝光: ");
-        postEvent(adId, "", OSETAdEvent.onAdExposure);
-    }
-
-    @Override
-    public void onError(String s, String s1) {
-        Log.d(TAG, "信息流渲染失败: ");
-        postEvent(adId, "广告渲染失败：" + s + ", s1：" + s1, OSETAdEvent.onAdError);
+                @Override
+                public void onLoadFail(String s, String s1) {
+                    Log.e(TAG, "信息流加载失败: ");
+                    postEvent(adId, "广告加载失败：" + s + ", s1：" + s1, OSETAdEvent.onAdError);
+                    release();
+                }
+            });
+        }
     }
 
     /**

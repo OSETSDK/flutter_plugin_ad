@@ -21,5 +21,5 @@ public class OSETAdEvent {
     // 超过广告时间
     public static final String onAdTimeOver = "onAdTimeOver";
 
-    public static final String onAdMeasured = "OnAdMeasured";
+    public static final String onAdMeasured = "onAdMeasured";
 }

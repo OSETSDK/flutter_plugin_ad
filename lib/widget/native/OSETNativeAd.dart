@@ -14,7 +14,6 @@ class OSETNativeAd extends OSETAd {
       {required super.adId,
       required this.posId,
       required this.adWidth,
-      required this.adHeight,
       });
 
   @override

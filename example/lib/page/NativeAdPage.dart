@@ -70,7 +70,6 @@ class _NativeState extends State<NativeAdPage> {
           : Common.iosPosIdNative,
       // 广告宽度
       adWidth: MediaQuery.of(context).size.width,
-      adHeight: 250,
     );
   }
 
@@ -96,9 +95,6 @@ class _NativeState extends State<NativeAdPage> {
     // 设置广告展示监听
     _nativeAdLoader.onAdRenderSuccess = (osetAd) {
       print('$TAG 信息流广告渲染成功...');
-      setState(() {
-        _nativeAd = osetAd.nativeWidget;
-      });
     };
 
     // 设置广告展示监听

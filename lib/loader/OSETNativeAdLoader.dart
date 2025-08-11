@@ -9,24 +9,20 @@ class OSETNativeAdLoader extends OSETAdLoader<OSETNativeAd> {
   loadAd({
     required String posId,
     required double adWidth,
-    required double adHeight,
   }) {
     load(posId: posId, methodName: OSETAdSDK.methodLoadNativeAd, arguments: {
       OSETAdSDK.keyPosId: posId,
       OSETAdSDK.keyAdWidth: adWidth,
-      OSETAdSDK.keyAdHeight: adHeight,
     });
   }
 
   @override
   OSETNativeAd createOSETAd(
       {required String adId, required Map<String, dynamic>? arguments}) {
-    print('adset_plugin 预设高度：${arguments?[OSETAdSDK.keyAdHeight]}');
     return OSETNativeAd(
       adId: adId,
       posId: arguments?[OSETAdSDK.keyPosId],
       adWidth: arguments?[OSETAdSDK.keyAdWidth] ?? double.infinity,
-      adHeight: arguments?[OSETAdSDK.keyAdHeight] ?? double.infinity,
     );
   }
 

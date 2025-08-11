@@ -13,7 +13,7 @@ class OSETAdManager {
   static const _eventOnAdClose = 'onAdClosed';
   static const _eventOnAdReward = 'onReward';
   static const _eventOnAdTimeOver = 'onAdTimeOver';
-  static const _eventOnAdMeasured = 'OnAdMeasured';
+  static const _eventOnAdMeasured = 'onAdMeasured';
 
   static final List<OSETAdLoader> _adLoaderList = [];
 
@@ -93,6 +93,7 @@ class OSETAdManager {
         break;
       case _eventOnAdClose:
         osetAdLoader.onAdCloseCallback(osetAd);
+        releaseAd(osetAd: osetAd);
         break;
       case _eventOnAdReward:
         osetAdLoader.onAdRewardCallback(osetAd);
