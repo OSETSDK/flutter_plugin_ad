@@ -9,7 +9,7 @@
 
 ```
 dependencies:
-  flutter_openset_ads: ^1.0.7
+  flutter_openset_ads: ^1.0.8
 ```
 
 
