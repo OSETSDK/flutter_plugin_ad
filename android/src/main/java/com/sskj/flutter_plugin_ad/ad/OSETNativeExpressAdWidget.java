@@ -1,6 +1,7 @@
 package com.sskj.flutter_plugin_ad.ad;
 
 import android.content.Context;
+import android.os.Build;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -9,6 +10,7 @@ import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 
 import com.kc.openset.ad._native.OSETNativeAd;
 import com.sskj.flutter_plugin_ad.manager.OSETNativeAdManager;
@@ -29,6 +31,7 @@ public class OSETNativeExpressAdWidget implements PlatformView {
     private FrameLayout parent;
     private FrameLayout adContainer;
 
+    @RequiresApi(api = Build.VERSION_CODES.HONEYCOMB_MR1)
     public OSETNativeExpressAdWidget(@NonNull Context context, String adId, double adWidth) {
         float density = context.getResources().getDisplayMetrics().density;
         int width = adWidth > 0 ? (int) (density * adWidth) : ViewGroup.LayoutParams.MATCH_PARENT;
@@ -43,12 +46,10 @@ public class OSETNativeExpressAdWidget implements PlatformView {
             OSETNativeAd nativeAd = osetNativeExpressAd.getNativeAd();
             View expressAdView = osetNativeExpressAd.getExpressAdView();
             if (nativeAd != null && nativeAd.isUsable() && expressAdView != null) {
-                // 手动测量广告View的高度
-                int measureHeight = measureAdHeight(context, expressAdView);
 
                 // 新建广告容器并将广告填入
                 adContainer = new FrameLayout(context);
-                adContainer.setLayoutParams(new ViewGroup.LayoutParams(width, measureHeight));
+                adContainer.setLayoutParams(new ViewGroup.LayoutParams(width, ViewGroup.LayoutParams.WRAP_CONTENT));
 
                 // 广告填入广告容器中
                 adContainer.addView(expressAdView);
@@ -64,13 +65,28 @@ public class OSETNativeExpressAdWidget implements PlatformView {
                 // 将广告容器放到FlutterView中
                 parent.addView(adContainer);
 
-                // 回调测量后的广告布局高度给flutter容器
-                Map<String, Object> extras = new HashMap<>();
-                extras.put("adId", adId);
-                extras.put("adEvent", OSETAdEvent.onAdMeasured);
-                extras.put("adWidth", width / density);
-                extras.put("adHeight", measureHeight / density);
-                PluginAdSetDelegate.getInstance().postEvent(extras);
+                parent.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+                    @Override
+                    public void onViewAttachedToWindow(@NonNull View v) {
+                        Log.d(TAG, "从window中attached: ");
+
+                        // 手动测量广告View的高度
+                        int measureHeight = measureAdHeight(context, parent);
+
+                        // 回调测量后的广告布局高度给flutter容器
+                        Map<String, Object> extras = new HashMap<>();
+                        extras.put("adId", adId);
+                        extras.put("adEvent", OSETAdEvent.onAdMeasured);
+                        extras.put("adWidth", width / density);
+                        extras.put("adHeight", measureHeight / density);
+                        PluginAdSetDelegate.getInstance().postEvent(extras);
+                    }
+
+                    @Override
+                    public void onViewDetachedFromWindow(@NonNull View v) {
+                        Log.d(TAG, "从window中detached: ");
+                    }
+                });
             }
         }
     }

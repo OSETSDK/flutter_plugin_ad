@@ -1,6 +1,11 @@
 import 'dart:io';
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_openset_ads/OSETAdSDK.dart';
@@ -22,6 +27,7 @@ class OSETNativeWidget extends StatefulWidget {
 }
 
 class _NativeAdWidgetState<T extends OSETNativeWidget> extends State<T> {
+
   @override
   Widget build(BuildContext context) {
     var creationParams = {
@@ -29,23 +35,43 @@ class _NativeAdWidgetState<T extends OSETNativeWidget> extends State<T> {
       OSETAdSDK.keyAdId: widget.osetNativeAd.adId,
       OSETAdSDK.keyAdWidth: widget.osetNativeAd.adWidth,
     };
+
+    final view = Platform.isAndroid
+        ? PlatformViewLink(
+            viewType: widget.viewType,
+            surfaceFactory: (context, controller) {
+              return AndroidViewSurface(
+                controller: controller as AndroidViewController,
+                gestureRecognizers: const <Factory<
+                    OneSequenceGestureRecognizer>>{},
+                hitTestBehavior: PlatformViewHitTestBehavior.opaque,
+              );
+            },
+            onCreatePlatformView: (params) {
+              return PlatformViewsService.initSurfaceAndroidView(
+                id: params.id,
+                viewType: widget.viewType,
+                layoutDirection: TextDirection.ltr,
+                creationParams: creationParams,
+                creationParamsCodec: const StandardMessageCodec(),
+              )
+                ..addOnPlatformViewCreatedListener(params.onPlatformViewCreated)
+                ..create();
+            },
+          )
+        : UiKitView(
+            viewType: widget.viewType,
+            creationParams: creationParams,
+            creationParamsCodec: const StandardMessageCodec(),
+          );
+
     return widget.osetNativeAd.adClosed
         ? SizedBox(width: widget.osetNativeAd.adWidth, height: 0)
         : Container(
             width: widget.osetNativeAd.adWidth,
-            height: max(widget.osetNativeAd.adHeight, 1),
+            height: max(widget.osetNativeAd.adHeight, 1), // 动态高度
             constraints: BoxConstraints(maxWidth: widget.osetNativeAd.adWidth),
-            child: Platform.isAndroid
-                ? AndroidView(
-                    viewType: widget.viewType,
-                    creationParams: creationParams,
-                    creationParamsCodec: const StandardMessageCodec(),
-                  )
-                : UiKitView(
-                    viewType: widget.viewType,
-                    creationParams: creationParams,
-                    creationParamsCodec: const StandardMessageCodec(),
-                  ),
+            child: view,
           );
   }
 
