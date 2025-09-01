@@ -1,18 +1,18 @@
 /// 广告测试id
 class Common {
   /// android 广告测试id
-  static const String androidAppId = "E6097975B89E83D6";
-  static const String androidPosIdSplash = "7D5239D8D88EBF9B6D317912EDAC6439";
+  static const String androidAppId = "072BFCAEA7CC1FFE";
+  static const String androidPosIdSplash = "E9A74218FE2F72428CBD423C0C37CFEC";
   static const String androidPosIdInterstitial =
-      "1D273967F51868AF2C4E080D496D06D0";
+      "F2F97814FAFD4E424399BF30395CA677";
   static const String androidPosIdFullscreenVideo =
-      "D879C3DED01D5CE319CD2751474BA8E4";
+      "742E67CED115EE2E2D426732FCFAE0A9";
   static const String androidPosIdRewardVideo =
-      "09A177D681D6FB81241C3DCE963DCB46";
-  static const String androidPosIdBanner = "107EB50EDFE65EA3306C8318FD57D0B3";
-  static const String androidPosIdNative = "89FEEA66F9228ED3F6420294B89A902B";
+      "95EFD11C0CE19BD0FF9D5B68AFE996D3";
+  static const String androidPosIdBanner = "7696F45213014B0FF58F31652A1EF638";
+  static const String androidPosIdNative = "A8B2887ADF3897D0046A0B4FC26B671A";
   static const String androidPosIdVideoPage =
-      "2A96205DFDDB8D27C784FF31F0625BA4";
+      "A7DA58805BAB3A84032B59D24FA4C46E";
 
   /// ios 广告测试id
   static const String iosAppId = "31DC084BB6B04838";

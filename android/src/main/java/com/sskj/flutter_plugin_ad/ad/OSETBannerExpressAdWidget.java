@@ -44,6 +44,8 @@ public class OSETBannerExpressAdWidget implements PlatformView {
         if (osetBannerExpressAd != null && osetBannerExpressAd.getBannerAd() != null && osetBannerExpressAd.getBannerAd().isUsable()) {
             View bannerAdView = osetBannerExpressAd.getBannerAdView();
             if (bannerAdView != null) {
+                // 手动测量广告View的高度
+//                int measureHeight = measureAdHeight(context, bannerAdView);
 
                 // 新建广告容器并将广告填入
                 adContainer = new FrameLayout(context);
@@ -66,18 +68,26 @@ public class OSETBannerExpressAdWidget implements PlatformView {
                 parent.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
                     @Override
                     public void onViewAttachedToWindow(@NonNull View v) {
-                        Log.d(TAG, "从window中attached: ");
+                        parent.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                Log.d(TAG, "从window中attached: ");
 
-                        // 手动测量广告View的高度
-                        int measureHeight = measureAdHeight(context, parent);
+                                // 手动测量广告View的高度
+                                int measureHeight = measureAdHeight(context, parent);
+                                ViewGroup.LayoutParams layoutParams = adContainer.getLayoutParams();
+                                layoutParams.height = measureHeight;
+                                adContainer.setLayoutParams(layoutParams);
 
-                        // 回调测量后的广告布局高度给flutter容器
-                        Map<String, Object> extras = new HashMap<>();
-                        extras.put("adId", adId);
-                        extras.put("adEvent", OSETAdEvent.onAdMeasured);
-                        extras.put("adWidth", width / density);
-                        extras.put("adHeight", measureHeight / density);
-                        PluginAdSetDelegate.getInstance().postEvent(extras);
+                                // 回调测量后的广告布局高度给flutter容器
+                                Map<String, Object> extras = new HashMap<>();
+                                extras.put("adId", adId);
+                                extras.put("adEvent", OSETAdEvent.onAdMeasured);
+                                extras.put("adWidth", width / density);
+                                extras.put("adHeight", measureHeight / density);
+                                PluginAdSetDelegate.getInstance().postEvent(extras);
+                            }
+                        }, 200);
                     }
 
                     @Override
@@ -85,6 +95,14 @@ public class OSETBannerExpressAdWidget implements PlatformView {
                         Log.d(TAG, "从window中detached: ");
                     }
                 });
+
+                // 回调测量后的广告布局高度给flutter容器
+//                Map<String, Object> extras = new HashMap<>();
+//                extras.put("adId", adId);
+//                extras.put("adEvent", OSETAdEvent.onAdMeasured);
+//                extras.put("adWidth", width / density);
+//                extras.put("adHeight", 1);
+//                PluginAdSetDelegate.getInstance().postEvent(extras);
             }
         }
     }
