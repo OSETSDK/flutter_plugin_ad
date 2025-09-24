@@ -9,7 +9,7 @@
 
 ```
 dependencies:
-  flutter_openset_ads: ^1.1.0
+  flutter_openset_ads: ^1.1.1
 ```
 
 
@@ -380,6 +380,23 @@ import 'package:flutter_openset_ads/loader/OSETNativeAdLoader.dart';
 | 模版信息流广告位id | 89FEEA66F9228ED3F6420294B89A902B |
 | 短视频内容模块id  | C5F4F13C421B10664D9D21EDB52C8C5D |
 
+
+### 安卓混淆配置
+拷贝flutter-demo中android/app模块中proguard-rules.pro中的混淆配置，到您项目中的android/app混淆配置文件中，并在您项目中的android模块下的build.gradle文件中添加混淆配置如下
+```
+    buildTypes {
+        release {
+            minifyEnabled true
+            signingConfig signingConfigs.release
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            signingConfig signingConfigs.debug
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+```
 
 ## iOS配置
 

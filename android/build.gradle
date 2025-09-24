@@ -97,7 +97,7 @@ dependencies {
 
 
     //基础包 start
-    implementation("com.shenshi:ad-openset-sdk:6.5.3.1")
+    implementation("com.shenshi:ad-openset-sdk:6.5.3.5")
     //基础包 end
 
     //    百度 start
@@ -126,8 +126,8 @@ dependencies {
     //sigmob end
 
     //快手 start
-//    implementation 'com.shenshi:ad-kuaishou-ad-adapter:4.6.30.1.1'// 快手-纯广告SDK
-    implementation 'com.shenshi:ad-kuaishou-ct-adapter:4.6.30.1.1'// 快手-包括广告和内容SDK
+    implementation 'com.shenshi:ad-kuaishou-ad-adapter:4.6.30.1.2'// 快手-纯广告SDK
+//    implementation 'com.shenshi:ad-kuaishou-ct-adapter:4.6.30.1.2'// 快手-包括广告和内容SDK
     //快手 end
 
     //广点通 start
@@ -135,7 +135,7 @@ dependencies {
     //广点通 end
 
     //倍孜 start
-    implementation 'com.shenshi:ad-beizi-adapter:5.2.1.20.1'
+    implementation 'com.shenshi:ad-beizi-adapter:5.2.1.20.2'
     //倍孜 end
 
     //tanx start
@@ -143,11 +143,11 @@ dependencies {
     //tanx end
 
     //海量 start
-    implementation 'com.shenshi:ad-hailiang-adapter:3.473.11.439.2'
+    implementation 'com.shenshi:ad-hailiang-adapter:3.473.11.439.1'
     //海量 end
 
     //章鱼 start
-    implementation 'com.shenshi:ad-zhangyu-adapter:1.6.4.6.2'
+    implementation 'com.shenshi:ad-zhangyu-adapter:1.6.4.6.1'
     //章鱼 end
 
     // 京东 start
