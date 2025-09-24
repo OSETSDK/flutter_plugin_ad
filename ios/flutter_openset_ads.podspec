@@ -18,7 +18,7 @@ A new Flutter plugin.
   s.dependency 'Flutter'
   s.platform = :ios, '12.0'
   s.static_framework = true
-  s.dependency 'OSETSDK', '>= 6.3.8.8'
+  s.dependency 'OSETSDK', '>= 6.3.9.0'
 
   # Flutter.framework does not contain a i386 slice.
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386' }
