@@ -97,22 +97,22 @@ dependencies {
 
 
     //基础包 start
-    implementation("com.shenshi:ad-openset-sdk:6.5.3.5")
+    implementation("com.shenshi:ad-openset-sdk:6.5.4.1")
     //基础包 end
 
     //    百度 start
     // 注意百度9.373版本开始，强制使用Androidx，如果使用这个版本以上的百度sdk，请将项目改为Androidx
-    implementation 'com.shenshi:ad-baidu-adapter:9.400.1'
+    implementation 'com.shenshi:ad-baidu-adapter:9.420.1'
     //    百度 end
 
 //    穿山甲&GroMore start
-    implementation("com.shenshi:ad-gromore-ad-adapter:7.0.1.2.1")// 纯广告SDK
+    implementation("com.shenshi:ad-gromore-ad-adapter:7.1.3.2.1")// 纯广告SDK
 
     //因为tanx会依赖第三方库 implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.8.0' 会和 gromore短剧的依赖库冲突，如果不使用tanx，请按照这个对接
-//    implementation("com.shenshi:ad-gromore-ct-adapter:7.0.1.2.1") // 包括广告和短剧内容SDK
+//    implementation("com.shenshi:ad-gromore-ct-adapter:7.1.3.2.1") // 包括广告和短剧内容SDK
 
     //因为tanx会依赖第三方库 implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.8.0' 会和 gromore短剧的依赖库冲突，如果使用tanx，请按照这个对接
-//    implementation("com.shenshi:ad-gromore-ct-adapter:7.0.1.2.1") {
+//    implementation("com.shenshi:ad-gromore-ct-adapter:7.1.3.2.1") {
 //        exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk7'
 //    }// 包括广告和短剧内容SDK
 
@@ -122,32 +122,32 @@ dependencies {
 //    穿山甲&GroMore end
 
     //sigmob start
-    implementation("com.shenshi:ad-sigmob-adapter:4.24.0.1")
+    implementation("com.shenshi:ad-sigmob-adapter:4.24.7.1")
     //sigmob end
 
     //快手 start
-    implementation 'com.shenshi:ad-kuaishou-ad-adapter:4.6.30.1.2'// 快手-纯广告SDK
-//    implementation 'com.shenshi:ad-kuaishou-ct-adapter:4.6.30.1.2'// 快手-包括广告和内容SDK
+    implementation 'com.shenshi:ad-kuaishou-ad-adapter:4.9.20.1.3'// 快手-纯广告SDK
+//    implementation 'com.shenshi:ad-kuaishou-ct-adapter:4.9.20.1.3'// 快手-包括广告和内容SDK
     //快手 end
 
     //广点通 start
-    implementation 'com.shenshi:ad-guangdiantong-adapter:4.650.1520.1'
+    implementation 'com.shenshi:ad-guangdiantong-adapter:4.660.1530.1'
     //广点通 end
 
     //倍孜 start
-    implementation 'com.shenshi:ad-beizi-adapter:5.2.1.20.2'
+    implementation 'com.shenshi:ad-beizi-adapter:5.2.2.0.1'
     //倍孜 end
 
     //tanx start
-    implementation 'com.shenshi:ad-tanx-adapter:3.7.24.1'
+    implementation 'com.shenshi:ad-tanx-adapter:3.7.29.1'
     //tanx end
 
     //海量 start
-    implementation 'com.shenshi:ad-hailiang-adapter:3.473.11.439.1'
+    implementation 'com.shenshi:ad-hailiang-adapter:3.474.12.440.1'
     //海量 end
 
     //章鱼 start
-    implementation 'com.shenshi:ad-zhangyu-adapter:1.6.4.6.1'
+    implementation 'com.shenshi:ad-zhangyu-adapter:2.5.10.15.1'
     //章鱼 end
 
     // 京东 start
