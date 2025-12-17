@@ -75,9 +75,9 @@ static FlutterPluginAdPlugin *manager = nil;
         if (call.arguments) {
             NSDictionary * dict = [NSDictionary dictionaryWithDictionary:call.arguments];
             [OSETManager configure:dict[@"appKey"]];
-            result(@(YES));
+            result(@{@"success":@(YES),@"code":@(0),@"msg":@"初始化成功"});
         }else{
-            result(@(NO));
+            result(@{@"success":@(NO),@"code":@(-100),@"msg":@"初始化失败，请检查appkey"});
         }
     }else if([@"showSplashAd" isEqualToString:call.method]) {
         if (call.arguments) {

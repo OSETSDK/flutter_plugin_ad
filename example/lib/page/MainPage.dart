@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:example/page/BannerAdPage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_openset_ads/InitAdResult.dart';
 import 'package:flutter_openset_ads/OSETAdSDK.dart';
 
 import '../common/Common.dart';
@@ -87,14 +88,14 @@ class _MainState extends State<MainPage> {
 
   /// 初始化广告 SDK
   void initAd() async {
-    try {
-      bool result = await OSETAdSDK.initAd(
-          appKey: Platform.isAndroid ? Common.androidAppId : Common.iosAppId,
-          debug: true);
-      _result = "广告SDK 初始化${result ? '成功' : '失败'}";
-    } on PlatformException catch (e) {
-      _result =
-      "广告SDK 初始化失败 code:${e.code} msg:${e.message} details:${e.details}";
+    final InitAdResult result = await OSETAdSDK.initAd(
+        appKey: Platform.isAndroid ? Common.androidAppId : Common.iosAppId,
+        debug: true);
+
+    if (result.success) {
+      _result = "广告 SDK 初始化成功";
+    } else {
+      _result = "广告SDK 初始化失败 code:${result.code} msg:${result.msg}";
     }
 
     setState(() {});

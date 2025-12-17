@@ -1,5 +1,6 @@
 
 import 'package:flutter/services.dart';
+import 'package:flutter_openset_ads/InitAdResult.dart';
 import 'package:flutter_openset_ads/OSETAdManager.dart';
 
 class OSETAdSDK {
@@ -58,17 +59,18 @@ class OSETAdSDK {
   /// 初始化广告SDK
   /// [appKey] 广告配置 appKey
   /// [debug] 是否为测试模式
-  static Future<bool> initAd({required String appKey, required bool debug}) async {
-    if (_initialized) return Future.value(true);
+  static Future<InitAdResult> initAd(
+      {required String appKey, required bool debug}) async {
+    if (_initialized) {
+      return Future.value(InitAdResult(success: true, code: 0, msg: "初始化成功"));
+    }
 
-    // _setupMethodCallHandler();
     _setupEventCallHandler();
-    var success = await invokeMethod(method: methodInit, params: {
-      keyAppKey: appKey,
-      keyIsDebug: debug
-    });
-    _initialized = success;
-    return Future.value(success);
+    final Map result = await _methodChannel.invokeMethod(methodInit, {keyAppKey: appKey, keyIsDebug: debug});
+    final InitAdResult initAdResult = InitAdResult.fromMap(result);
+
+    _initialized = initAdResult.success;
+    return Future.value(initAdResult);
   }
 
   /// 设置方法监听
