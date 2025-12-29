@@ -126,8 +126,8 @@ dependencies {
     //sigmob end
 
     //快手 start
-    implementation 'com.shenshi:ad-kuaishou-ad-adapter:4.9.20.5.1'// 快手-纯广告SDK
-//    implementation 'com.shenshi:ad-kuaishou-ct-adapter:4.9.20.5.1'// 快手-包括广告和内容SDK
+//    implementation 'com.shenshi:ad-kuaishou-ad-adapter:4.9.20.5.1'// 快手-纯广告SDK
+    implementation 'com.shenshi:ad-kuaishou-ct-adapter:4.9.20.5.1'// 快手-包括广告和内容SDK
     //快手 end
 
     //广点通 start
