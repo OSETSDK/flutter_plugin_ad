@@ -81,6 +81,7 @@ static FlutterPluginAdPlugin *manager = nil;
         }
     }else if([@"showSplashAd" isEqualToString:call.method]) {
         if (call.arguments) {
+            adParams.adType = @"splash";
             OSETFSplashAdManager *osetSplashAdManager = [OSETFSplashAdManager getOSETSplashAdManager];
             [osetSplashAdManager loadSplashAd:adParams isRequestIdfa:1];
         }else{
@@ -88,6 +89,7 @@ static FlutterPluginAdPlugin *manager = nil;
         }
     }else if([@"showInterstitialAd" isEqualToString:call.method]) {
         if (call.arguments) {
+            adParams.adType = @"interstitial";
             OSETFInterstitialAdManager *osetSplashAdManager = [OSETFInterstitialAdManager getOSETInterstitialAdManager];
             [osetSplashAdManager loadInterstitialAd:adParams isRequestIdfa:1];
         }else{
@@ -95,6 +97,7 @@ static FlutterPluginAdPlugin *manager = nil;
         }
     }else if([@"showFullscreenVideoAd" isEqualToString:call.method]) {
         if (call.arguments) {
+            adParams.adType = @"fullscreenVideo";
             OSETFFullscreenVideoAdManager *osetSplashAdManager = [OSETFFullscreenVideoAdManager getOSETFullscreenVideoAdManager];
             [osetSplashAdManager loadFullscreenVideoAd:adParams ];
         }else{
@@ -103,6 +106,7 @@ static FlutterPluginAdPlugin *manager = nil;
     }else if([@"showRewardVideoAd" isEqualToString:call.method]) {
         if (call.arguments) {
             if ([self isNotNull:adParams.posId]) {
+                adParams.adType = @"rewardVideo";
                 OSETFRewardVideoAdManager *osetRewardVideoAdManager = [OSETFRewardVideoAdManager getOSETRewardVideoAdManager];
                 [osetRewardVideoAdManager loadRewardVideoAd:adParams isRequestIdfa:1];
                 result(@(YES));
@@ -115,10 +119,12 @@ static FlutterPluginAdPlugin *manager = nil;
     }else if ([@"loadNativeAd" isEqualToString:call.method]) {
         /// 加载信息流模板广告
         OSETFNativeAdManager *osetNativeExpressAdManager = [OSETFNativeAdManager getOSETFNativeAdManager];
+        adParams.adType = @"native";
         [osetNativeExpressAdManager loadNativeAd:adParams isRequestIdfa:1];
     }else if ([@"loadBannerAd" isEqualToString:call.method]) {
         /// 加载Banner广告
         OSETFBannerAdManager *osetBannerAdManager = [OSETFBannerAdManager getOSETFBannerAdManager];
+        adParams.adType = @"banner";
         [osetBannerAdManager loadBannerAd:adParams isRequestIdfa:1];
     }else if([@"checkAndReqPermission" isEqualToString:call.method]) {
         if (@available(iOS 14, *)) {

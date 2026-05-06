@@ -12,6 +12,7 @@
     _posId = [NSString stringWithFormat:@"%@",arguments[@"posId"]];
     _adId = [NSString stringWithFormat:@"%@",arguments[@"adId"]];
     _userId = [NSString stringWithFormat:@"%@",arguments[@"userId"]];
+    _adType = [NSString stringWithFormat:@"%@",arguments[@"adType"]];
     _adWidth = arguments[@"adWidth"];
     _adHeight = arguments[@"adHeight"];
 }

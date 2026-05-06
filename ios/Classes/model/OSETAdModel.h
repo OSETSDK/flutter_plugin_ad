@@ -14,6 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) NSString *adId;
 @property (nonatomic) NSString *adLogo;
 @property (nonatomic) NSString *userId;
+@property (nonatomic) NSString *adType;
 @property (nonatomic) NSNumber *adWidth;
 @property (nonatomic) NSNumber *adHeight;
 
