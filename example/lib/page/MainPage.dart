@@ -12,7 +12,6 @@ import 'InterstitialAdPage.dart';
 import 'FullVideoAdPage.dart';
 import 'RewardVideoAdPage.dart';
 import 'NativeAdPage.dart';
-import 'VideoContentPage.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -57,7 +56,9 @@ class _MainState extends State<MainPage> {
                 children: [
                   Text('Running on: $_platformVersion'),
                   Text('init: $_result'),
-                  buildCommonButton('初始化', callback: initAd),
+                  buildCommonButton('初始化（默认隐私配置）', callback: initAd),
+                  buildCommonButton('初始化（自定义隐私合规配置）',
+                      callback: initAdWithPrivacyConfig),
                   buildCommonButton('请求权限', callback: OSETAdSDK.checkAndReqPermission),
                   buildCommonButton('开屏广告', callback: () {
                     _push(context, const SplashAdLauncherPage());
@@ -77,9 +78,6 @@ class _MainState extends State<MainPage> {
                   buildCommonButton('原生信息流广告', callback: () {
                     _push(context, const NativeAdPage());
                   }),
-                  buildCommonButton('短视频内容', callback: () {
-                    _push(context, const VideoContentPage());
-                  }),
                 ],
               )),
         ));
@@ -87,10 +85,39 @@ class _MainState extends State<MainPage> {
 
   /// 初始化广告 SDK
   void initAd() async {
+    await _initAd();
+  }
+
+  /// 初始化广告 SDK（Android 自定义隐私合规配置）
+  ///
+  /// 隐私合规配置必须在用户同意 App 隐私政策之后再下发，并且只在初始化时生效，
+  /// 因此需要在 initAd 中一次性传入。iOS 端会忽略该配置。
+  void initAdWithPrivacyConfig() async {
+    final privacyConfig = OSETPrivacyConfig(
+      // 关闭个性化广告
+      canUsePersonalizedAd: false,
+      // 禁止 SDK 主动采集硬件参数（imei/meid/imsi/iccid）
+      canUsePhoneState: false,
+      // 禁止 SDK 主动读取 androidId
+      canUseAndroidId: false,
+      // 禁止 SDK 主动获取 oaid
+      canUseOaid: false,
+      // 禁止 SDK 主动获取地理位置
+      canReadLocation: false,
+      // 禁止 SDK 主动读取 App 安装列表
+      canReadInstalledPackages: false,
+      // 禁止 SDK 主动使用传感器
+      canUseSensor: false,
+    );
+    await _initAd(privacyConfig: privacyConfig);
+  }
+
+  Future<void> _initAd({OSETPrivacyConfig? privacyConfig}) async {
     try {
       bool result = await OSETAdSDK.initAd(
           appKey: Platform.isAndroid ? Common.androidAppId : Common.iosAppId,
-          debug: true);
+          debug: true,
+          privacyConfig: privacyConfig);
       _result = "广告SDK 初始化${result ? '成功' : '失败'}";
     } on PlatformException catch (e) {
       _result =

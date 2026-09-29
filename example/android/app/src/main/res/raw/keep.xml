@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    用途: 防止 release 构建开启 shrinkResources=true 时,
+          OpenSet 聚合广告 SDK 的资源(通过 JNI/反射加载)被压缩器误删,
+          否则展示广告时会抛出 Resources$NotFoundException 导致闪退。
+    位置: app 模块 res/raw/keep.xml
+-->
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:shrinkMode="safe"
+    tools:keep="
+        @anim/oset_*,
+        @drawable/oset_*,
+        @layout/oset_*,
+        @mipmap/oset_*,
+        @xml/oset_*,
+        @color/oset_*,
+        @string/oset_*,
+        @style/OSET_*,
+        @attr/adSetMaxWidth,
+        @attr/adSetMaxHeight" />

@@ -5,6 +5,8 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
@@ -15,7 +17,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 
 import com.jiagu.sdk.OSETSDKProtected;
-import com.kc.openset.VideoContentConfig;
 import com.kc.openset.ad.full.OSETFullAd;
 import com.kc.openset.ad.full.OSETFullVideo;
 import com.kc.openset.ad.intestitial.OSETInterstitial;
@@ -33,10 +34,8 @@ import com.kc.openset.ad.reward.OSETRewardVideo;
 import com.kc.openset.ad.splash.OSETSplash;
 import com.kc.openset.ad.splash.OSETSplashAd;
 import com.kc.openset.config.OSETSDK;
+import com.kc.openset.config.controller.OSETCustomController;
 import com.kc.openset.listener.OSETInitListener;
-import com.kc.openset.video.OSETVideoContent;
-import com.kc.openset.video.OSETVideoContentTaskListener;
-import com.sskj.flutter_plugin_ad.callback.ClickItem;
 import com.sskj.flutter_plugin_ad.config.OSETAdEvent;
 import com.sskj.flutter_plugin_ad.factory.AdBannerViewFactory;
 import com.sskj.flutter_plugin_ad.factory.AdNativeViewFactory;
@@ -80,6 +79,8 @@ public class PluginAdSetDelegate implements PluginRegistry.ActivityResultListene
     public static final String USER_ID = "userId";
     public static final String AD_EVENT = "adEvent";
     public static final String AD_MSG = "adMsg";
+    ///  隐私合规配置
+    public static final String PRIVACY_CONFIG = "privacyConfig";
 
     private static volatile PluginAdSetDelegate instance;
 
@@ -181,12 +182,6 @@ public class PluginAdSetDelegate implements PluginRegistry.ActivityResultListene
             case "loadNativeAd":
                 OSETNativeAdManager.getInstance().loadNativeExpressAd(activity, posId, adId);
                 break;
-            case "showVideoPage":
-                showVideoPage(call, result);
-                break;
-            case "showKsVideoFragment":
-                showKsVideoFragment(call, result);
-                break;
             case "releaseAd":
                 // 释放广告
                 loopNotifyOnAdRelease(adId);
@@ -205,22 +200,33 @@ public class PluginAdSetDelegate implements PluginRegistry.ActivityResultListene
 
     /**
      * 初始化
+     * <p>
+     * 一定要在用户同意 APP 隐私政策之后调用，第一个参数需要填入 Application，否则无法正常使用 sdk。
      *
      * @param call   MethodCall
      * @param result Result
      */
     public void initAd(MethodCall call, MethodChannel.Result result) {
-        // 一定要在 Application 中初始化 sdk，第一个参数需要填入 Application，否则无 法正常使用 sdk
         String appKey = call.argument("appKey");
         if (TextUtils.isEmpty(appKey)) {
             result.error("-200", "参数错误，appKey 不能为空", new Exception("参数错误，appKey 不能为空"));
             return;
         }
-        boolean isDebug = call.argument("isDebug");
+        boolean isDebug = Boolean.TRUE.equals(call.argument("isDebug"));
+        String userId = call.argument(USER_ID);
+        Map<String, Object> privacyConfig = call.argument(PRIVACY_CONFIG);
+        Log.d(TAG, "initAd: " + appKey + ", isDebug: " + isDebug);
 
         try {
             OSETSDKProtected.install(activity.getApplication());
-            OSETSDK.getInstance().init(activity.getApplication(), appKey, new OSETInitListener() {
+            OSETSDK sdk = OSETSDK.getInstance()
+                    // 隐私合规配置
+                    .setCustomController(new OSETCustomControllerImpl(privacyConfig));
+            if (!TextUtils.isEmpty(userId)) {
+                // 接入方的用户 Id，用于根据用户反馈排查问题，没有可不传
+                sdk = sdk.setUserId(userId);
+            }
+            sdk.init(activity.getApplication(), appKey, new OSETInitListener() {
                 @Override
                 public void onError(String s) {
                     Log.d(TAG, "初始化失败：" + s);
@@ -235,6 +241,137 @@ public class PluginAdSetDelegate implements PluginRegistry.ActivityResultListene
         } catch (Exception e) {
             Log.d(TAG, "初始化失败 error:" + e.getMessage());
             result.error("-100", "初始化失败", e);
+        }
+    }
+
+    /**
+     * 隐私合规配置实现
+     * <p>
+     * Flutter 侧未传入的字段一律回落到 SDK 的默认值（开关默认允许，取值默认取 SDK 自动采集的值），
+     * 因此这里全部使用 Java 侧默认值实现，不调用 native 的 super 实现，避免 SDK 尚未加载 so 时报错。
+     * <p>
+     * 详见 <a href="https://doc.shenshiads.com/Android.html">OpenSet Android SDK 隐私合规配置</a>
+     */
+    public static class OSETCustomControllerImpl extends OSETCustomController {
+
+        private final Map<String, Object> config;
+
+        public OSETCustomControllerImpl(Map<String, Object> config) {
+            this.config = config == null ? new HashMap<String, Object>() : config;
+        }
+
+        private boolean booleanValue(String key, boolean defaultValue) {
+            Object value = config.get(key);
+            if (value instanceof Boolean) return (Boolean) value;
+            return defaultValue;
+        }
+
+        private String stringValue(String key) {
+            Object value = config.get(key);
+            return value instanceof String ? (String) value : null;
+        }
+
+        private double doubleValue(String key) {
+            Object value = config.get(key);
+            return value instanceof Number ? ((Number) value).doubleValue() : 0d;
+        }
+
+        /// 是否允许 SDK 主动使用地理位置信息
+        @Override
+        public boolean canReadLocation() {
+            return booleanValue("canReadLocation", true);
+        }
+
+        /// canReadLocation=false 时，SDK 使用这里传入的地理位置信息
+        @Override
+        public Location getLocation() {
+            if (config.containsKey("latitude") && config.containsKey("longitude")) {
+                Location location = new Location(LocationManager.GPS_PROVIDER);
+                location.setLatitude(doubleValue("latitude"));
+                location.setLongitude(doubleValue("longitude"));
+                return location;
+            }
+            return null;
+        }
+
+        /// 是否允许 SDK 主动使用手机硬件参数，如：imei, meid, imsi, iccid
+        @Override
+        public boolean canUsePhoneState() {
+            return booleanValue("canUsePhoneState", true);
+        }
+
+        /// canUsePhoneState=false 时，SDK 使用这里传入的 imei（原始值，无需 md5）
+        @Override
+        public String getImei() {
+            return stringValue("imei");
+        }
+
+        /// 是否允许 SDK 主动读取 androidId
+        @Override
+        public boolean canUseAndroidId() {
+            return booleanValue("canUseAndroidId", true);
+        }
+
+        /// canUseAndroidId=false 时，SDK 使用这里传入的 androidId
+        @Override
+        public String getAndroidId() {
+            return stringValue("androidId");
+        }
+
+        /// 是否允许 SDK 主动使用 oaid
+        @Override
+        public boolean canUseOaid() {
+            return booleanValue("canUseOaid", true);
+        }
+
+        /// canUseOaid=false 时，SDK 使用这里传入的 oaid（原始值，无需 md5）
+        @Override
+        public String getOaid() {
+            return stringValue("oaid");
+        }
+
+        /// 是否允许 SDK 主动使用 ACCESS_NETWORK_STATE 权限
+        @Override
+        public boolean canUseNetworkState() {
+            return booleanValue("canUseNetworkState", true);
+        }
+
+        /// 是否允许 SDK 主动使用存储权限
+        @Override
+        public boolean canUseStoragePermission() {
+            return booleanValue("canUseStoragePermission", true);
+        }
+
+        /// 是否允许 SDK 主动读取 app 安装列表
+        @Override
+        public boolean canReadInstalledPackages() {
+            return booleanValue("canReadInstalledPackages", true);
+        }
+
+        /// canReadInstalledPackages=false 时，SDK 使用这里传入的安装列表
+        @Override
+        public List<String> getInstalledPackages() {
+            Object value = config.get("installedPackages");
+            if (value instanceof List) {
+                List<String> packages = new ArrayList<>();
+                for (Object item : (List<?>) value) {
+                    if (item instanceof String) packages.add((String) item);
+                }
+                return packages;
+            }
+            return null;
+        }
+
+        /// 是否启用个性化广告，默认开启
+        @Override
+        public boolean canUsePersonalizedAd() {
+            return booleanValue("canUsePersonalizedAd", true);
+        }
+
+        /// 是否允许 SDK 主动使用传感器
+        @Override
+        public boolean canUseSensor() {
+            return booleanValue("canUseSensor", true);
         }
     }
 
@@ -489,100 +626,6 @@ public class PluginAdSetDelegate implements PluginRegistry.ActivityResultListene
                     }
                 });
         result.success(true);
-    }
-
-    public void showVideoPage(MethodCall call, MethodChannel.Result result) {
-        String posId = call.argument(POS_ID);
-        String adId = call.argument(AD_ID);
-        int rewardCount = call.argument("rewardCount");
-        int rewardDownTime = call.argument("rewardDownTime");
-        if (TextUtils.isEmpty(posId)) {
-            result.error("-300", "参数错误，posId 不能为空", new Exception("参数错误，posId 不能为空"));
-            return;
-        }
-
-        VideoContentConfig videoContentConfig = new VideoContentConfig.Builder()
-                .setNeedBack(true)
-                .setRewardCount(rewardCount)
-                .setRewardDownTime(rewardDownTime)
-                .build();
-        OSETVideoContent.getInstance().setPosId(posId).showByActivity(activity, videoContentConfig, new OSETVideoContentTaskListener() {
-
-            @Override
-            public void onClose() {
-                //关闭回调
-                postEvent(adId, OSETAdEvent.onAdClosed);
-            }
-
-            @Override
-            public void onLoadFail(String s, String s1) {
-                Log.e(TAG, "code:" + s + "----message:" + s1);
-                // 出错了
-                postEvent(adId, "code: " + s + ", msg: " + s1, OSETAdEvent.onAdError);
-            }
-
-            @Override
-            public void onTimeOver() {
-                //key用做校验
-                // 验证地址 http://open-set-api.shenshiads.com/reward/check/<key>（返回数据: {"code": 0}，code为0表示验证成
-                postEvent(adId, OSETAdEvent.onAdTimeOver);
-            }
-
-            @Override
-            public void onVideoComplete(int i, boolean b, String s) {
-                //视频结束播放
-                android.util.Log.e(TAG, "视频结束播放:" + i);
-            }
-
-            @Override
-            public void onVideoPause(int i, boolean b, String s) {
-                //视频暂停播放
-                android.util.Log.e(TAG, "视频暂停播放:" + i);
-            }
-
-            @Override
-            public void onVideoPlayError(int i, boolean b, String s, String s1, String s2) {
-
-            }
-
-            @Override
-            public void onVideoResume(int i, boolean b, String s) {
-                //视频重新播放
-                android.util.Log.e(TAG, "视频重新播放:" + i);
-            }
-
-            @Override
-            public void onVideoStart(int i, boolean b, String s) {
-                //视频开始播放
-                android.util.Log.e(TAG, "视频开始播放:" + i);
-            }
-        });
-        postEvent(adId, OSETAdEvent.onAdLoaded);
-        result.success(true);
-    }
-
-    public void showKsVideoFragment(MethodCall call, MethodChannel.Result result) {
-        String posId = call.argument(POS_ID);
-        String adId = call.argument(AD_ID);
-        if (TextUtils.isEmpty(posId)) {
-            result.error("-300", "参数错误，posId 不能为空", new Exception("参数错误，posId 不能为空"));
-            postEvent(adId, "参数错误，posId 不能为空", OSETAdEvent.onAdError);
-            return;
-        }
-
-        Intent intent = new Intent(activity, VideoHomeActivity.class);
-        intent.putExtra(AD_ID, posId);
-        activity.startActivity(intent);
-        activity.overridePendingTransition(0, 0);
-        postEvent(adId, OSETAdEvent.onAdLoaded);
-        VideoHomeActivity.onClickItem(new ClickItem() {
-            @Override
-            public void selectItem(int index) {
-                Log.e(TAG, "index: " + index);
-                result.success(index);
-                postEvent(adId, index + "", "KsVideoFragment");
-            }
-        });
     }
 
     @NonNull

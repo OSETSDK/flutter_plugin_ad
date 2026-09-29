@@ -8,8 +8,8 @@ plugins {
 android {
     namespace = "com.example.example"
     compileSdk = flutter.compileSdkVersion
-//    ndkVersion = flutter.ndkVersion
-    ndkVersion = "27.0.12077973"
+    // 跟随当前 Flutter SDK 的默认 NDK 版本，避免本机未安装硬编码版本导致构建失败
+    ndkVersion = flutter.ndkVersion
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -29,6 +29,8 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        // 64K 方法数问题，官方文档要求开启
+        multiDexEnabled = true
     }
 
     buildTypes {

@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'package:flutter/services.dart';
 import 'entity/ad_event.dart';
+import 'entity/privacy_config.dart';
 
 export 'view/banner_ad_widget.dart';
 export 'view/native_ad_widget.dart';
+export 'entity/privacy_config.dart';
 
 class FlutterPluginAd {
   // 方法渠道
@@ -20,13 +22,30 @@ class FlutterPluginAd {
   }
 
   /// 初始化广告
+  ///
+  /// 必须在用户同意 App 隐私政策之后调用。
+  ///
   /// [appKey] 广告配置 appKey
   /// [isDebug] 是否为测试模式
-  static Future<bool> initAd(String appKey, {bool isDebug = false}) async {
-    final bool result = await _channel.invokeMethod(
-      'initAd',
-      {'appKey': appKey, 'isDebug': isDebug},
-    );
+  /// [userId] 接入方的用户唯一 id，用于根据用户反馈排查问题，没有可不传
+  /// [privacyConfig] Android 原生隐私合规配置，不传则与 SDK 默认行为一致（全部允许）
+  static Future<bool> initAd(
+    String appKey, {
+    bool isDebug = false,
+    String? userId,
+    OSETPrivacyConfig? privacyConfig,
+  }) async {
+    final Map<String, dynamic> arguments = <String, dynamic>{
+      'appKey': appKey,
+      'isDebug': isDebug,
+    };
+    if (userId != null && userId.isNotEmpty) {
+      arguments['userId'] = userId;
+    }
+    if (privacyConfig != null) {
+      arguments['privacyConfig'] = privacyConfig.toMap();
+    }
+    final bool result = await _channel.invokeMethod('initAd', arguments);
     return result;
   }
 
@@ -97,31 +116,6 @@ class FlutterPluginAd {
       {'adId': ""},
     );
     return result;
-  }
-
-  /// 展示短视频内容太广告
-  /// [adId]            广告配置 adId
-  /// [rewardCount]     奖励次数
-  /// [rewardDownTime]  单次奖励需要观看的时长
-  static Future<bool> showVideoPage(String adId, int rewardCount, int rewardDownTime) async {
-    final bool result = await _channel.invokeMethod(
-      'showVideoPage',
-      {
-        'adId': adId,
-        'rewardCount': rewardCount,
-        'rewardDownTime': rewardDownTime,
-      },
-    );
-    return result;
-  }
-
-  /// 展示短视频内容首页
-  /// [adId] 广告配置 adId
-  static Future<bool> showKsVideoFragment(String adId) async {
-    return await _channel.invokeMethod(
-      'showKsVideoFragment',
-      {'adId': adId},
-    );
   }
 
   ///事件回调

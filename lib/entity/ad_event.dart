@@ -34,8 +34,6 @@ class EventType {
   static const String onReward = 'onReward';
   // 跳过广告
   static const String onAdSkip = "onAdSkip";
-  // 超过广告时间
-  static const String onAdTimeOver = "onAdTimeOver";
 }
 
 /// 事件类型

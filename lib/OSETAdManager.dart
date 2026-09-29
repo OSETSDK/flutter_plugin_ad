@@ -14,7 +14,6 @@ class OSETAdManager {
   static const _eventOnAdClick = 'onAdClicked';
   static const _eventOnAdClose = 'onAdClosed';
   static const _eventOnAdReward = 'onReward';
-  static const _eventOnAdTimeOver = 'onAdTimeOver';
   static const _eventOnAdMeasured = 'onAdMeasured';
 
   static final List<OSETAdLoader> _adLoaderList = [];
@@ -99,9 +98,6 @@ class OSETAdManager {
         break;
       case _eventOnAdReward:
         osetAdLoader.onAdRewardCallback(osetAd);
-        break;
-      case _eventOnAdTimeOver:
-        osetAdLoader.onAdTimeOverCallback(osetAd);
         break;
       case _eventOnAdMeasured:
         double adWidth = arguments[OSETAdSDK.keyAdWidth] ?? 0;

@@ -11,8 +11,6 @@ class Common {
       "95EFD11C0CE19BD0FF9D5B68AFE996D3";
   static const String androidPosIdBanner = "7696F45213014B0FF58F31652A1EF638";
   static const String androidPosIdNative = "A8B2887ADF3897D0046A0B4FC26B671A";
-  static const String androidPosIdVideoPage =
-      "A7DA58805BAB3A84032B59D24FA4C46E";
 
   /// ios 广告测试id
   static const String iosAppId = "31DC084BB6B04838";
@@ -23,5 +21,4 @@ class Common {
       "8FCB39267CE40245B87EF8835A853708";
   static const String iosPosIdBanner = "7B2BD37383E008B422C93486EACEA11D";
   static const String iosPosIdNative = "921DE1BF1B3F06838AE04233A42B01F1";
-  static const String iosPosIdVideoPage = "E06C7BB2C34605B4CD777EFD590DD4BE";
 }

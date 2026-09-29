@@ -32,3 +32,15 @@
 
 ## [1.1.3]
 - 更新安卓原生SDK版本
+
+## [1.2.0]
+- 更新安卓原生SDK及全部第三方ADN适配器版本（ad-openset-sdk 6.5.9.2）
+- 新增华为广告适配器（ad-huawei-adapter），移除京东适配器
+- 新增 Android 原生隐私合规配置支持（OSETPrivacyConfig / OSETCustomController）
+- 移除短视频内容模块（SDK 6.5.9.x 基础包已不再包含 com.kc.openset.video）
+- 初始化支持传入 userId
+- 文档补充隐私合规、资源压缩 keep.xml、华为渠道说明
+- 修复：补充华为 Maven 仓库，否则 ad-huawei-adapter 的 ads-lite 依赖无法解析
+- 修复：显式声明插件 ndkVersion，避免回落到 AGP 默认 NDK 版本而强制接入方升级 NDK
+- 修复：移除与 SDK manifest 重复声明的 OSETWebViewActivity，解决 manifest 合并冲突
+- 修复：example 的 Dart SDK 约束放宽为 ^3.5.0，可用 Flutter 3.24.x 正常运行

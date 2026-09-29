@@ -20,30 +20,9 @@
         android:networkSecurityConfig="@xml/network_security_config1"
         tools:replace="android:allowBackup,android:networkSecurityConfig">
 
-        <!--  启动屏广告 -->
-<!--        <activity-->
-<!--            android:name=".AdSplashActivity"-->
-<!--            android:configChanges="keyboardHidden|orientation|screenSize"-->
-<!--            android:screenOrientation="portrait"-->
-<!--            android:theme="@android:style/Theme.Holo.NoActionBar.Fullscreen" />-->
-
-        <!--        <activity-->
-        <!--            android:name="com.sigmob.sdk.base.common.AdActivity"-->
-        <!--            android:configChanges="keyboardHidden|orientation|screenSize"-->
-        <!--            tools:replace="android:configChanges"/>-->
-
-        <activity android:name="com.kc.openset.video.VideoContentActivity"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
-
-        <activity android:name="com.kc.openset.activity.OSETWebViewActivity"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
-
-        <activity
-            android:name="com.sskj.flutter_plugin_ad.VideoHomeActivity"
-            android:configChanges="orientation|keyboardHidden|screenSize"
-            android:launchMode='standard'
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <!-- 注意：OSETWebViewActivity 等 SDK 内部 Activity 由 ad-openset-sdk 的
+             AndroidManifest 自行声明（含 @style/OSET_WebViewActivityTheme），
+             插件侧不要再重复声明，否则会与 SDK 的 manifest 冲突导致合并失败。 -->
 
         <!--注意，sigmob的配置只有在support环境下需要配置，Androidx环境可以忽略，不需要配置-->
         <!--sigmob-->

@@ -14,7 +14,6 @@ abstract class OSETAdLoader<T extends OSETAd> {
   OnOSETAdEvent<T>? onAdClick;
   OnOSETAdEvent<T>? onAdClose;
   OnOSETAdEvent<T>? onAdReward;
-  OnOSETAdEvent<T>? onAdTimeOver;
 
   String get adId => _adId;
 
@@ -67,11 +66,6 @@ abstract class OSETAdLoader<T extends OSETAd> {
   /// 广告奖励回调
   onAdRewardCallback(T osetAd) {
     onAdReward?.call(osetAd);
-  }
-
-  /// 短视频奖励回调
-  onAdTimeOverCallback(T osetAd) {
-    onAdTimeOver?.call(osetAd);
   }
 
   /// 释放广告

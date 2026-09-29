@@ -18,8 +18,6 @@ public class OSETAdEvent {
     public static final String onAdClicked = "onAdClicked";
     // 获得奖励
     public static final String onReward = "onReward";
-    // 超过广告时间
-    public static final String onAdTimeOver = "onAdTimeOver";
 
     public static final String onAdMeasured = "onAdMeasured";
 }

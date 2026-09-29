@@ -1,6 +1,9 @@
 
 import 'package:flutter/services.dart';
 import 'package:flutter_openset_ads/OSETAdManager.dart';
+import 'package:flutter_openset_ads/entity/privacy_config.dart';
+
+export 'package:flutter_openset_ads/entity/privacy_config.dart';
 
 class OSETAdSDK {
   /// 方法渠道
@@ -17,9 +20,9 @@ class OSETAdSDK {
   static const keyAdHeight = 'adHeight';
   static const keyUserId = 'userId';
   static const keyAdMsg = 'adMsg';
-  static const keyRewardCount = 'rewardCount';
-  static const keyRewardDownTime = 'rewardDownTime';
   static const keyToastMsg = 'toastMsg';
+  /// 隐私合规配置
+  static const keyPrivacyConfig = 'privacyConfig';
 
   static const methodGetPlatformVersion = 'getPlatformVersion';
   static const methodCheckAndReqPermission = 'checkAndReqPermission';
@@ -32,8 +35,6 @@ class OSETAdSDK {
   static const methodLoadRewardVideoAd = 'showRewardVideoAd';
   static const methodLoadBannerAd = "loadBannerAd";
   static const methodLoadNativeAd = "loadNativeAd";
-  static const methodShowVideoPage = "showVideoPage";
-  static const methodShowKsVideoFragment = "showKsVideoFragment";
 
   static const methodReleaseAd = 'releaseAd';
   static const methodOnAdEvent = 'onAdEvent';
@@ -56,17 +57,34 @@ class OSETAdSDK {
   }
 
   /// 初始化广告SDK
+  ///
+  /// 必须在用户同意 App 隐私政策之后调用。
+  ///
   /// [appKey] 广告配置 appKey
   /// [debug] 是否为测试模式
-  static Future<bool> initAd({required String appKey, required bool debug}) async {
+  /// [userId] 接入方的用户唯一 id，用于根据用户反馈排查问题，没有可不传
+  /// [privacyConfig] Android 原生隐私合规配置，不传则与 SDK 默认行为一致（全部允许）
+  static Future<bool> initAd({
+    required String appKey,
+    required bool debug,
+    String? userId,
+    OSETPrivacyConfig? privacyConfig,
+  }) async {
     if (_initialized) return Future.value(true);
 
     // _setupMethodCallHandler();
     _setupEventCallHandler();
-    var success = await invokeMethod(method: methodInit, params: {
+    var params = <String, dynamic>{
       keyAppKey: appKey,
-      keyIsDebug: debug
-    });
+      keyIsDebug: debug,
+    };
+    if (userId != null && userId.isNotEmpty) {
+      params[keyUserId] = userId;
+    }
+    if (privacyConfig != null) {
+      params[keyPrivacyConfig] = privacyConfig.toMap();
+    }
+    var success = await invokeMethod(method: methodInit, params: params);
     _initialized = success;
     return Future.value(success);
   }
