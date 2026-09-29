@@ -32,13 +32,33 @@
 
 ## [1.1.3]
 - 更新安卓原生SDK版本
+## [1.1.31]
+- 移除gromoresdk
+
+## [1.1.32]
+- 移除oaid
+
+## [1.1.33]
+- 移除oaid、gromore
+
+
+## [1.1.35]
+- 更新广告SDK正常版本
+
+## [1.1.36]
+- 支持快手短视频
+
+## [1.1.38]
+- 安卓广告SDK更新6555版本
+- iOS广告类型增加adType
 
 ## [1.2.0]
-- 更新安卓原生SDK及全部第三方ADN适配器版本（ad-openset-sdk 6.5.9.2）
+- 更新安卓原生SDK及全部第三方ADN适配器版本（ad-openset-sdk 6.5.9.2，取自官方文档）
 - 新增华为广告适配器（ad-huawei-adapter），移除京东适配器
 - 新增 Android 原生隐私合规配置支持（OSETPrivacyConfig / OSETCustomController）
-- 移除短视频内容模块（SDK 6.5.9.x 基础包已不再包含 com.kc.openset.video）
 - 初始化支持传入 userId
+- initAd 返回 InitAdResult（合并远端 1.1.38：success / code / msg）
+- 移除短视频内容模块（SDK 6.5.9.x 基础包已不再包含 com.kc.openset.video）
 - 文档补充隐私合规、资源压缩 keep.xml、华为渠道说明
 - 修复：补充华为 Maven 仓库，否则 ad-huawei-adapter 的 ads-lite 依赖无法解析
 - 修复：显式声明插件 ndkVersion，避免回落到 AGP 默认 NDK 版本而强制接入方升级 NDK

@@ -1,5 +1,6 @@
 
 import 'package:flutter/services.dart';
+import 'package:flutter_openset_ads/InitAdResult.dart';
 import 'package:flutter_openset_ads/OSETAdManager.dart';
 import 'package:flutter_openset_ads/entity/privacy_config.dart';
 
@@ -64,17 +65,18 @@ class OSETAdSDK {
   /// [debug] 是否为测试模式
   /// [userId] 接入方的用户唯一 id，用于根据用户反馈排查问题，没有可不传
   /// [privacyConfig] Android 原生隐私合规配置，不传则与 SDK 默认行为一致（全部允许）
-  static Future<bool> initAd({
+  static Future<InitAdResult> initAd({
     required String appKey,
     required bool debug,
     String? userId,
     OSETPrivacyConfig? privacyConfig,
   }) async {
-    if (_initialized) return Future.value(true);
+    if (_initialized) {
+      return Future.value(InitAdResult(success: true, code: 0, msg: "初始化成功"));
+    }
 
-    // _setupMethodCallHandler();
     _setupEventCallHandler();
-    var params = <String, dynamic>{
+    final Map<String, dynamic> params = <String, dynamic>{
       keyAppKey: appKey,
       keyIsDebug: debug,
     };
@@ -84,9 +86,11 @@ class OSETAdSDK {
     if (privacyConfig != null) {
       params[keyPrivacyConfig] = privacyConfig.toMap();
     }
-    var success = await invokeMethod(method: methodInit, params: params);
-    _initialized = success;
-    return Future.value(success);
+    final Map result = await _methodChannel.invokeMethod(methodInit, params);
+    final InitAdResult initAdResult = InitAdResult.fromMap(result);
+
+    _initialized = initAdResult.success;
+    return Future.value(initAdResult);
   }
 
   /// 设置方法监听

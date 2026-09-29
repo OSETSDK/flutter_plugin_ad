@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:example/page/BannerAdPage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_openset_ads/InitAdResult.dart';
 import 'package:flutter_openset_ads/OSETAdSDK.dart';
 
 import '../common/Common.dart';
@@ -114,11 +115,13 @@ class _MainState extends State<MainPage> {
 
   Future<void> _initAd({OSETPrivacyConfig? privacyConfig}) async {
     try {
-      bool result = await OSETAdSDK.initAd(
+      final InitAdResult result = await OSETAdSDK.initAd(
           appKey: Platform.isAndroid ? Common.androidAppId : Common.iosAppId,
           debug: true,
           privacyConfig: privacyConfig);
-      _result = "广告SDK 初始化${result ? '成功' : '失败'}";
+      _result = result.success
+          ? "广告SDK 初始化成功"
+          : "广告SDK 初始化失败 code:${result.code} msg:${result.msg}";
     } on PlatformException catch (e) {
       _result =
       "广告SDK 初始化失败 code:${e.code} msg:${e.message} details:${e.details}";

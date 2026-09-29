@@ -47,6 +47,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.plugin.common.EventChannel;
@@ -208,14 +209,19 @@ public class PluginAdSetDelegate implements PluginRegistry.ActivityResultListene
      */
     public void initAd(MethodCall call, MethodChannel.Result result) {
         String appKey = call.argument("appKey");
+        Map<String, Object> res = new HashMap<>();
         if (TextUtils.isEmpty(appKey)) {
-            result.error("-200", "参数错误，appKey 不能为空", new Exception("参数错误，appKey 不能为空"));
+            res.put("success", false);
+            res.put("code", -200);
+            res.put("msg", "参数错误，appKey 不能为空");
+            result.success(res);
             return;
         }
         boolean isDebug = Boolean.TRUE.equals(call.argument("isDebug"));
         String userId = call.argument(USER_ID);
         Map<String, Object> privacyConfig = call.argument(PRIVACY_CONFIG);
         Log.d(TAG, "initAd: " + appKey + ", isDebug: " + isDebug);
+        AtomicBoolean replied = new AtomicBoolean(false);
 
         try {
             OSETSDKProtected.install(activity.getApplication());
@@ -230,17 +236,33 @@ public class PluginAdSetDelegate implements PluginRegistry.ActivityResultListene
                 @Override
                 public void onError(String s) {
                     Log.d(TAG, "初始化失败：" + s);
+                    if (replied.compareAndSet(false, true)) {
+                        res.put("success", false);
+                        res.put("code", -100);
+                        res.put("msg", s);
+                        result.success(res);
+                    }
                 }
 
                 @Override
                 public void onSuccess() {
                     Log.d(TAG, "初始化成功");
+                    if (replied.compareAndSet(false, true)) {
+                        res.put("success", true);
+                        res.put("code", 0);
+                        res.put("msg", "初始化成功");
+                        result.success(res);
+                    }
                 }
             });
-            result.success(true);
         } catch (Exception e) {
-            Log.d(TAG, "初始化失败 error:" + e.getMessage());
-            result.error("-100", "初始化失败", e);
+            Log.d(TAG, "初始化异常 error:" + e.getMessage());
+            if (replied.compareAndSet(false, true)) {
+                res.put("success", false);
+                res.put("code", -101);
+                res.put("msg", "初始化异常：" + e.getMessage());
+                result.success(res);
+            }
         }
     }
 
